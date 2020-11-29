@@ -182,43 +182,49 @@ public class AVLTree {
    * (It must implement IAVLNode)
    */
   public class AVLNode implements IAVLNode{
-	  int key;
-	  String val;
-	  AVLNode left;
-	  AVLNode right;
-	  AVLNode parent;
-		public AVLNode(AVLNode){
-			this.Parent = AVLNode;
-		}
+	  private int key;
+	  private String val;
+	  private AVLNode left = null;
+	  private AVLNode right = null;
+	  private AVLNode parent= null;
+	  private int height;
+	  	public AVLNode(int Key, String Val){
+	  	this.key= Key;
+	  	this.val = Val;
+	  	}
 		public int getKey()
 		{
-			return this.key; // to be replaced by student code
+			return this.key; //returns key
 		}
 		public String getValue()
 		{
-			return this.val; // to be replaced by student code
+			return this.val; // returns value
 		}
 		public void setLeft(IAVLNode node)
 		{
-			this.left = node;
-			return null; // to be replaced by student code
+			this.left=(AVLNode) node; // to be replaced by student code
 		}
 		public IAVLNode getLeft()
 		{
-			return this.left; // to be replaced by student code
+			if (this.left==null || this.left.getValue()=="-1") {
+				return null;
+			}
+			return this.left; // returns the left child of the node if it has one, or null otherwise
 		}
 		public void setRight(IAVLNode node)
 		{
-			this.right = node;
-			return null; // to be replaced by student code
+			this.right=(AVLNode) node; // to be replaced by student code
 		}
 		public IAVLNode getRight()
 		{
-			return this.right; // to be replaced by student code
+			if (this.right==null || this.right.getKey()==-1) {
+				return null;
+			}
+			return this.right; // returns the right child of the node if it has one, or null otherwise
 		}
 		public void setParent(IAVLNode node)
 		{
-			return null; // to be replaced by student code
+			this.parent=(AVLNode) node; // sets the given node as the parent of the current node
 		}
 		public IAVLNode getParent()
 		{
@@ -227,17 +233,16 @@ public class AVLTree {
 		// Returns True if this is a non-virtual AVL node
 		public boolean isRealNode()
 		{
-			return true; // to be replaced by student code
+			return ((this.getKey()!=-1) ? true : false); // returns true if the key is positive else returns false
 		}
     public void setHeight(int height)
     {
-      return null; // to be replaced by student code
+      this.height = height; // to be replaced by student code
     }
     public int getHeight()
     {
-      return 42; // to be replaced by student code
+      return this.height; // to be replaced by student code
     }
   }
 
 }
-  
