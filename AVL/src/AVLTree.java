@@ -1,3 +1,9 @@
+import java.util.LinkedList;
+import java.util.List;
+
+import AVLTree.AVLNode;
+import AVLTree.IAVLNode;
+
 /**
  *
  * AVLTree
@@ -8,6 +14,10 @@
  */
 
 public class AVLTree {
+	
+	private AVLNode root = null;  
+	private AVLNode min;
+	private AVLNode max;
 
   /**
    * public boolean empty()
@@ -16,7 +26,7 @@ public class AVLTree {
    *
    */
   public boolean empty() {
-    return false; // to be replaced by student code
+	  return (this.root == null);
   }
 
  /**
@@ -65,7 +75,10 @@ public class AVLTree {
     */
    public String min()
    {
-	   return "42"; // to be replaced by student code
+	   if(this.empty()){ //tree is empty
+		   return null;
+	   }
+	   return this.min.val;
    }
 
    /**
@@ -86,9 +99,32 @@ public class AVLTree {
    * or an empty array if the tree is empty.
    */
   public int[] keysToArray()
-  {
-        int[] arr = new int[42]; // to be replaced by student code
-        return arr;              // to be replaced by student code
+  {	
+	  int[] keysArray = new int[this.getRoot().getSize()];
+	  
+      if(this.empty() == true) {
+    	  return keysArray;
+        }
+      
+	  List<IAVLNode> inOrderNodeList = new LinkedList<IAVLNode>(); 
+	  this.inOrderList(this.getRoot(), inOrderNodeList);
+	  
+	  int i = 0;
+	  for(IAVLNode node : inOrderNodeList) {
+		  keysArray[i] = node.getKey();
+		  i++;
+	  }
+	  return keysArray;
+  }
+  public void inOrderList(IAVLNode node, List<IAVLNode> inOrderNodeList) {
+	 
+	  if(!node.isRealNode()) {
+		  return;
+	  }
+	  this.inOrderList(node.getLeft(), inOrderNodeList);
+	  inOrderNodeList.add(node);
+	  this.inOrderList(node.getRight(), inOrderNodeList);  
+	  
   }
 
   /**
@@ -114,7 +150,7 @@ public class AVLTree {
     */
    public int size()
    {
-	   return 42; // to be replaced by student code
+	   return this.root.getSize(); 
    }
    
      /**
@@ -127,7 +163,7 @@ public class AVLTree {
     */
    public IAVLNode getRoot()
    {
-	   return null;
+	   return this.root;
    }
      /**
     * public string split(int x)
@@ -170,6 +206,7 @@ public class AVLTree {
 		public boolean isRealNode(); // Returns True if this is a non-virtual AVL node
     	public void setHeight(int height); // sets the height of the node
     	public int getHeight(); // Returns the height of the node (-1 for virtual nodes)
+    	public int getSize(); // returns the size of the node's subtree including the node itself
 	}
 
    /**
@@ -188,6 +225,8 @@ public class AVLTree {
 	  private AVLNode right = null;
 	  private AVLNode parent= null;
 	  private int height;
+	  private int size;
+	  
 	  	public AVLNode(int Key, String Val){
 	  	this.key= Key;
 	  	this.val = Val;
@@ -243,6 +282,10 @@ public class AVLTree {
     {
       return this.height; // to be replaced by student code
     }
+    public int getSize() {
+    	return this.size;
+    }
+   
   }
 
 }
