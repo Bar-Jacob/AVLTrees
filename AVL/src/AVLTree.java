@@ -37,7 +37,18 @@ public class AVLTree {
    */
   public String search(int k)
   {
-	return "42";  // to be replaced by student code
+	  AVLNode node = (AVLNode) this.getRoot();
+	  while (node.isRealNode()) {
+		  if (node.getKey() == k){
+			  return node.getValue();
+		  }
+		  if (node.getKey() > k) {
+			  node = (AVLNode) node.getLeft();
+		  }else {
+			  node= (AVLNode) node.getRight();
+		  }
+	  }
+	return null;  
   }
 
   /**
@@ -136,8 +147,20 @@ public class AVLTree {
    */
   public String[] infoToArray()
   {
-        String[] arr = new String[42]; // to be replaced by student code
-        return arr;                    // to be replaced by student code
+	  String[] infoArray = new String[this.getRoot().getSize()];
+      if(this.empty() == true) {
+    	  return infoArray;
+        }
+      
+	  List<IAVLNode> inOrderNodeList = new LinkedList<IAVLNode>(); 
+	  this.inOrderList(this.getRoot(), inOrderNodeList);
+	  
+	  int i = 0;
+	  for(IAVLNode node : inOrderNodeList) {
+		  infoArray[i] = node.getValue();
+		  i++;
+	  }
+	  return infoArray;                   
   }
 
    /**
