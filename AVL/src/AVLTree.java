@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -75,6 +76,28 @@ public class AVLTree {
    */
    public int delete(int k)
    {
+	   if (this.max.getKey()==k) { // if we're trying to delete the maximal node, it doesn't have a right son
+		   AVLNode node = this.max;
+		   if (node.left.isRealNode()) {
+			   node.parent.right=(AVLNode) node.getLeft();
+			   node.parent.right.parent = node.parent;
+		   }else {
+			   this.max.parent.right=null;
+		   }
+		   this.calcmax(); // we need to update the current maximal node
+		   return 0;
+	   }
+	   if (this.min.getKey()==k) { // if we're trying to delete the minimal node, it doesn't have a left son
+		   AVLNode node = this.min;
+		   if (node.right.isRealNode()) {
+			   node.parent.left=(AVLNode) node.getRight();
+			   node.parent.left.parent = node.parent;
+		   }else {
+			   this.min.parent.left=null;
+		   }
+		   this.calcmin(); // we need to update the current minimal node
+		   return 0;
+	   }
 	   return 42;	// to be replaced by student code
    }
 
@@ -100,8 +123,34 @@ public class AVLTree {
     */
    public String max()
    {
-	   return "42"; // to be replaced by student code
+	   return this.max(); //this is a saved field in our data structure :)
    }
+   
+   /**
+    * public void calcmax()
+    * 
+    * calculates the max key out of our tree
+    */
+   public void calcmax() {
+	   AVLNode node = (AVLNode) this.getRoot();
+	   AVLNode max = null;
+	   while (node.isRealNode()) {
+		   max= node;
+		   node = (AVLNode) node.getRight();
+	   }
+	   this.max= max;
+   }
+   
+   public void calcmin() {
+	   AVLNode node = (AVLNode) this.getRoot();
+	   AVLNode min = null;
+	   while (node.isRealNode()) {
+		   min= node;
+		   node = (AVLNode) node.getLeft();
+	   }
+	   this.min= min;
+   }
+   
 
   /**
    * public int[] keysToArray()
