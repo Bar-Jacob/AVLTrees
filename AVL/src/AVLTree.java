@@ -38,16 +38,9 @@ public class AVLTree {
    */
   public String search(int k)
   {
-	  AVLNode node = (AVLNode) this.getRoot();
-	  while (node.isRealNode()) {
-		  if (node.getKey() == k){
-			  return node.getValue();
-		  }
-		  if (node.getKey() > k) {
-			  node = (AVLNode) node.getLeft();
-		  }else {
-			  node= (AVLNode) node.getRight();
-		  }
+	  AVLNode node = SearchNode(k);
+	  if (node.isRealNode()) {
+		  return node.getValue();
 	  }
 	return null;  
   }
@@ -98,7 +91,27 @@ public class AVLTree {
 		   this.calcmin(); // we need to update the current minimal node
 		   return 0;
 	   }
+	   AVLNode node2delete =  this.SearchNode(k);
+	   if (node2delete == null) { // the tree doesn't contain a node with key k... nothing to delete
+		   return -1;
+	   }
+	   
 	   return 42;	// to be replaced by student code
+   }
+   
+   private AVLNode SearchNode (int k) {
+	   AVLNode node = (AVLNode) this.getRoot();
+		  while (node.isRealNode()) {
+			  if (node.getKey() == k){
+				  return node;
+			  }
+			  if (node.getKey() > k) {
+				  node = (AVLNode) node.getLeft();
+			  }else {
+				  node= (AVLNode) node.getRight();
+			  }
+		  }
+		return null;
    }
 
    /**
