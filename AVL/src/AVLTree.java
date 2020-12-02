@@ -129,9 +129,15 @@ public class AVLTree {
    /**
     * public void calcmax()
     * 
-    * calculates the max key out of our tree
+    * calculates the max key out of our tree and sets the corresponding field
+    * if the tree is empty, it sets it to null
     */
    public void calcmax() {
+	   if (this.empty()){
+		   this.max = null;
+		   this.min = null;
+		   return;
+	   }
 	   AVLNode node = (AVLNode) this.getRoot();
 	   AVLNode max = null;
 	   while (node.isRealNode()) {
@@ -141,7 +147,19 @@ public class AVLTree {
 	   this.max= max;
    }
    
+   /**
+    * public void calcmin()
+    * 
+    * calculates the minimal key out of our tree and sets the corresponding field
+    * if the tree is empty, it sets it to null
+    */
+   
    public void calcmin() {
+	   if (this.empty()){
+		   this.min = null;
+		   this.max = null;
+		   return;
+	   }
 	   AVLNode node = (AVLNode) this.getRoot();
 	   AVLNode min = null;
 	   while (node.isRealNode()) {
