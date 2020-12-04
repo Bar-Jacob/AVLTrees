@@ -33,7 +33,7 @@ public class AVLTree {
 	 * returns null
 	 */
 	public String search(int k) {
-		AVLNode node = SearchNode(k);
+		IAVLNode node = SearchNode(k);
 		if (node.isRealNode()) {
 			return node.getValue();
 		}
@@ -174,7 +174,7 @@ public class AVLTree {
 			this.calcmin(); // we need to update the current minimal node
 			return 0;
 		}
-		AVLNode node2delete = this.SearchNode(k);
+		IAVLNode node2delete = this.SearchNode(k);
 		if (node2delete == null) { // the tree doesn't contain a node with key k... nothing to delete
 			return -1;
 		}
@@ -182,16 +182,21 @@ public class AVLTree {
 		return 42; // to be replaced by student code
 	}
 
-	private AVLNode SearchNode(int k) {
-		AVLNode node = (AVLNode) this.getRoot();
+	/**
+	 * SearchNode(int k):
+	 * @param int k
+	 * @return node with key == k or null if there is no such node in the tree
+	 */
+	private IAVLNode SearchNode(int k) {
+		IAVLNode node = this.getRoot();
 		while (node.isRealNode()) {
 			if (node.getKey() == k) {
 				return node;
 			}
 			if (node.getKey() > k) {
-				node = (AVLNode) node.getLeft();
+				node = node.getLeft();
 			} else {
-				node = (AVLNode) node.getRight();
+				node = node.getRight();
 			}
 		}
 		return null;
@@ -207,7 +212,7 @@ public class AVLTree {
 		if (this.empty()) { // tree is empty
 			return null;
 		}
-		return this.min.val;
+		return this.min.getValue();
 	}
 
 	/**
@@ -217,7 +222,10 @@ public class AVLTree {
 	 * tree is empty
 	 */
 	public String max() {
-		return this.max(); // this is a saved field in our data structure :)
+		if (this.empty()) { // tree is empty
+			return null;
+		}
+		return this.max.getValue(); // this is a saved field in our data structure :)
 	}
 
 	/**
@@ -232,11 +240,11 @@ public class AVLTree {
 			this.min = null;
 			return;
 		}
-		AVLNode node = (AVLNode) this.getRoot();
-		AVLNode max = null;
+		IAVLNode node = this.getRoot();
+		IAVLNode max = null;
 		while (node.isRealNode()) {
 			max = node;
-			node = (AVLNode) node.getRight();
+			node = node.getRight();
 		}
 		this.max = max;
 	}
@@ -254,11 +262,11 @@ public class AVLTree {
 			this.max = null;
 			return;
 		}
-		AVLNode node = (AVLNode) this.getRoot();
-		AVLNode min = null;
+		IAVLNode node = this.getRoot();
+		IAVLNode min = null;
 		while (node.isRealNode()) {
 			min = node;
-			node = (AVLNode) node.getLeft();
+			node = node.getLeft();
 		}
 		this.min = min;
 	}
