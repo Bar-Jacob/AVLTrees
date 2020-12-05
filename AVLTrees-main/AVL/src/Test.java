@@ -37,6 +37,16 @@ public class Test {
 		// TODO Auto-generated method stub
 		AVLTree tree = new AVLTree();
 		tree.insert(1, "omg");
+		tree.insert(2, "lol");
+		tree.insert(3, "pls");
+		tree.insert(4, "pls");
+		tree.insert(5, "pls");
+		tree.insert(5, "pls");
+		tree.insert(6, "pls");
+		tree.insert(7, "pls");
+		tree.insert(8, "pls");
+		tree.insert(9, "pls");
+		tree.insert(10, "pls");
 		print2D(tree.getRoot());
 	}
 
