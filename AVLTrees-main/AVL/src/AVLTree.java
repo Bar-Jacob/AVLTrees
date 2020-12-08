@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import AVLTree.AVLNode;
+import AVLTree.IAVLNode;
+
 /**
  *
  * AVLTree
@@ -77,7 +80,6 @@ public class AVLTree {
 			newNode.setParent(position);
 		}
 		newNode.updatePath();
-		System.out.println("***I'm here!***");
 		return rebalance(newNode);
 
 	}
@@ -85,7 +87,7 @@ public class AVLTree {
 	public int rebalance(IAVLNode node) {
 		int cnt = 0;
 		while (node != null) {
-
+			
 			AVLNode newNode = (AVLNode) node;
 
 			if (newNode.rankDiffLeft() == 0) { // problem with left subtree
@@ -94,7 +96,7 @@ public class AVLTree {
 					cnt++;
 				} else {
 					if (newNode.getLeft().rankDiffLeft() == 1 && // case 2: node-02 with child-12, terminal
-							newNode.getRight().rankDiffRight() == 2) {
+							newNode.getLeft().rankDiffRight() == 2) {
 
 						newNode.demote(); // sol: demote + right rotate
 						node = this.rotateRight(newNode);
@@ -116,8 +118,8 @@ public class AVLTree {
 					newNode.promote(); // sol: promote
 					cnt++;
 				} else {
-					if (newNode.getLeft().rankDiffLeft() == 1 && // case2: node-02 with child-12, terminal
-							newNode.getRight().rankDiffRight() == 2) {
+					if (newNode.getRight().rankDiffLeft() == 2 && // case2: node-20 with child-12, terminal
+							newNode.getRight().rankDiffRight() == 1) {
 
 						newNode.demote(); // sol: demote + left rotate
 						node = this.rotateLeft(newNode);
@@ -377,7 +379,7 @@ public class AVLTree {
 		return keysArray;
 	}
 
-	public void inOrderList(IAVLNode node, List<IAVLNode> inOrderNodeList) {
+	private void inOrderList(IAVLNode node, List<IAVLNode> inOrderNodeList) {
 
 		if (!node.isRealNode()) {
 			return;
@@ -443,6 +445,28 @@ public class AVLTree {
 	 */
 	public AVLTree[] split(int x) {
 		return null;
+	}
+	
+	private AVLTree[] split(int x, IAVLNode node) {
+		
+		IAVLNode pNode = node;
+		AVLTree[] result = new AVLTree[2];
+
+		result[0] = new AVLTree();	//smaller than x
+		result[1] = new AVLTree();	//bigger than x
+		
+		result[0].root = node.getLeft();
+		result[1].root = node.getRight();
+		pNode = node.getParent();
+		
+		while(node != null) {
+			if(pNode.getKey() < x) {
+				
+				result[0] = this.join(pNode, result[0]);
+			}
+		}
+			
+		
 	}
 
 	/**
