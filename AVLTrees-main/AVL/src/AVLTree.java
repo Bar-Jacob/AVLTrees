@@ -18,6 +18,7 @@ public class AVLTree {
 	private IAVLNode root = null;
 	private IAVLNode min;
 	private IAVLNode max;
+	private IAVLNode virtualLeaf = new AVLNode();
 
 	/**
 	 * public boolean empty()
@@ -153,17 +154,29 @@ public class AVLTree {
 	 * -1 if an item with key k was not found in the tree.
 	 */
 	public int delete(int k) {
+		int binarymax=0;
+		int binarymin=0;
+		if (this.max.getKey()==k) {
+			binarymax =1;
+		}
+		if (this.min.getKey()==k) {
+			binarymin =1;
+		}
 		int counter =0;
 		if (this.search(k)==null) {
 			return -1;}
 		DelRec(k, this.root, counter);
+		if (binarymax==1) {
+			updatemax();}
+		if (binarymin==1) {
+			updatemin();}
 		return counter;
 		}
 	// a recursive deletion function
 	private IAVLNode DelRec(int k,IAVLNode root, int counter) {
 		// First we find the node recursively
 		if (!root.isRealNode()) {
-			return root;} 			// Safety check, we shouldn't get here
+			return root;} 			// recursion end
 		if (root.getKey()>k) {		
 			// we need to turn left
 			root.setLeft(DelRec(k, root.getLeft(), counter));}
@@ -176,24 +189,42 @@ public class AVLTree {
 			if (!root.getLeft().isRealNode() || !root.getRight().isRealNode()) {
 				// node has one or zero sons
 				IAVLNode temp = null;
-				if (root.getLeft().isRealNode()) { // we need to find if the node has a real son
-					temp = root.getLeft();
-				}else {
+				if (!root.getLeft().isRealNode()) { // we need to find if the node has a real son
 					temp = root.getRight();
+				}else {
+					temp = root.getLeft();
 				}
-				if (temp.isRealNode()) {
+				if (!temp.isRealNode()) {
 					// root doesn't have kids
 					temp = root;
-					root = null;				 //**********************************virtual
+					root = virtualLeaf;				 //**********************************virtual
 				}else {
-					root = temp; // root is now a virtual leaf
+					root = temp; // root is switched with it's son
 				}
 			}else {
 				//node has two sons
+				// first we'll find it's successor
 				IAVLNode successor = successor(root);
-				IAVLNode temp = root;
-				switchAB(root, successor); // we need to effectively switch the node with it's successor. should we use a function?
-				root.setRight(DelRec(successor.getKey(), root.getRight(), counter));
+				// now lets switch them
+				IAVLNode temp = root.getLeft();
+				root.setLeft(successor.getLeft());
+				successor.setLeft(temp);
+				temp = root.getRight();
+				root.setRight(successor.getRight());
+				successor.setRight(temp);
+				if (root.getParent().getKey() >root.getKey()) {
+					//root is it's parent's left son
+					root.getParent().setLeft(successor);
+				}else {
+					//root is it's parent's right son
+					root.getParent().setRight(successor);
+				}
+				temp = successor;
+				successor= root;
+				root = temp;
+				// now the root and it's successor are switched. lets delete the temp (=root) node from the right subtree recursively
+				root.setRight(DelRec(temp.getKey(), root.getRight(), counter));
+				
 			}
 			
 			if(!root.isRealNode()) {		// this means our tree only had one node
@@ -249,6 +280,7 @@ public class AVLTree {
 	            return 0;}
 	        return (node.getLeft().getHeight() - node.getRight().getHeight());
 	    }  
+ 
 	
 
 	/**
@@ -297,16 +329,17 @@ public class AVLTree {
 		return this.max.getValue(); // this is a saved field in our data structure :)
 	}
 	/**
-	 * public void calcmax()
+	 * public void updatemax()
 	 * 
 	 * calculates the max key out of our tree and sets the corresponding field if
 	 * the tree is empty, it sets it to null
+	 * @return 
 	 */
-	public void calcmax() {
+	public void updatemax() {
 		if (this.empty()) {
-			this.max = null;
-			this.min = null;
+			this.max = virtualLeaf;
 			return;
+
 		}
 		IAVLNode node = this.getRoot();
 		IAVLNode max = null;
@@ -318,16 +351,15 @@ public class AVLTree {
 	}
 
 	/**
-	 * public void calcmin()
+	 * public void updatemin()
 	 * 
 	 * calculates the minimal key out of our tree and sets the corresponding field
 	 * if the tree is empty, it sets it to null
 	 */
 
-	public void calcmin() {
+	public void updatemin() {
 		if (this.empty()) {
-			this.min = null;
-			this.max = null;
+			this.min = virtualLeaf;
 			return;
 		}
 		IAVLNode node = this.getRoot();
@@ -736,6 +768,10 @@ public class AVLTree {
 
 		public int getSize() {
 			return this.size;
+		}
+		
+		public void setSize(int i) {
+			this.size=(i);
 		}
 
 		public void promote() {
