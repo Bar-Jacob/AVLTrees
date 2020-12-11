@@ -153,118 +153,102 @@ public class AVLTree {
 	 * -1 if an item with key k was not found in the tree.
 	 */
 	public int delete(int k) {
-		
-		if (this.max.getKey() == k) { // if we're trying to delete the maximal node, it doesn't have a right son
-			IAVLNode node = this.max;
-			if (node.getLeft().isRealNode()) {
-				node.getParent().setRight(node.getLeft());
-				node.getParent().getRight().setParent(node.getParent());
-			} else {
-				this.max.getParent().setRight(null);
-			}
-			this.calcmax(); // we need to update the current maximal node
-			return 0;
+		int counter =0;
+		if (this.search(k)==null) {
+			return -1;}
+		DelRec(k, this.root, counter);
+		return counter;
 		}
-		if (this.min.getKey() == k) { // if we're trying to delete the minimal node, it doesn't have a left son
-			IAVLNode node = this.min;
-			if (node.getRight().isRealNode()) {
-				node.getParent().setLeft(node.getRight());
-				node.getParent().getLeft().setParent(node.getParent());
-			} else {
-				this.min.getParent().setLeft(null);
-			}
-			this.calcmin(); // we need to update the current minimal node
-			return 0;
-		}
-		
-		// this is the start
-		IAVLNode node2delete = this.SearchNode(k);
-		if (node2delete == null) { // the tree doesn't contain a node with key k... nothing to delete
-			return -1;
-		}
-		IAVLNode Parent = node2delete.getParent();
-		IAVLNode Rson = node2delete.getRight();
-		IAVLNode Lson = node2delete.getLeft();
-		if (!Rson.isRealNode() && !Lson.isRealNode()) { // we want to delete a leaf without sons.
-			if (Parent.getLeft()==node2delete) {
-				Parent.setLeft(null);
+	// a recursive deletion function
+	private IAVLNode DelRec(int k,IAVLNode root, int counter) {
+		// First we find the node recursively
+		if (!root.isRealNode()) {
+			return root;} 			// Safety check, we shouldn't get here
+		if (root.getKey()>k) {		
+			// we need to turn left
+			root.setLeft(DelRec(k, root.getLeft(), counter));}
+		if (root.getKey()<k) {		
+			// we need to turn right
+			root.setRight(DelRec(k, root.getRight(), counter));}
+		if (root.getKey()==k) {		
+			// we found the node to delete!
+			
+			if (!root.getLeft().isRealNode() || !root.getRight().isRealNode()) {
+				// node has one or zero sons
+				IAVLNode temp = null;
+				if (root.getLeft().isRealNode()) { // we need to find if the node has a real son
+					temp = root.getLeft();
+				}else {
+					temp = root.getRight();
+				}
+				if (temp.isRealNode()) {
+					// root doesn't have kids
+					temp = root;
+					root = null;				 //**********************************virtual
+				}else {
+					root = temp; // root is now a virtual leaf
+				}
 			}else {
-				Parent.setRight(null); // we need to change it to the virtual "-1" node instead of "null"
+				//node has two sons
+				IAVLNode successor = successor(root);
+				IAVLNode temp = root;
+				switchAB(root, successor); // we need to effectively switch the node with it's successor. should we use a function?
+				root.setRight(DelRec(successor.getKey(), root.getRight(), counter));
 			}
 			
-		}
-		if (!Rson.isRealNode() || !Lson.isRealNode()) { // the node2delete only has 1 son!
-			if (!Rson.isRealNode()) { //we want to delete a node with only a left son
-				if (Parent.getLeft()==node2delete) { //the node2delete is the left son of the parent
-					Parent.setLeft(Lson);
-					Lson.setParent(Parent);		
-				}else { //the node2delete is the right son of the parent
-					Parent.setLeft(Lson);
-					Lson.setParent(Parent);	
+			if(!root.isRealNode()) {		// this means our tree only had one node
+				return root;
+			}
+			
+			// update the height and size
+			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
+			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
+			
+			// calc balance factor
+			int bala = Bfactor(root);
+			
+			// now to check if we need to re balance:
+			if (bala>1) {
+				if (Bfactor(root.getLeft())<0) {
+					// Left Right rotation
+					counter+= 2;
+					root.setLeft(rotateLeft(root.getLeft()));
+					return(rotateRight(root.getRight()));
+				}else {
+					// Left Left rotation
+					counter++;
+					return(rotateRight(root));
 				}
 			}
-			if (!Lson.isRealNode()) { //we want to delete a node with only a Right son
-				if (Parent.getLeft()==node2delete) { //the node2delete is the left son of the parent
-					Parent.setLeft(Rson);
-					Rson.setParent(Parent);		
-				}else { //the node2delete is the right son of the parent
-					Parent.setLeft(Rson);
-					Rson.setParent(Parent);	
-				}	
+			if (bala<-1) {
+				if (Bfactor(root.getRight())<=0) {
+					// Right Right rotation
+					counter++;
+					return rotateLeft(root);
+				}else {
+					// Right Left rotation
+					counter+= 2;
+					root.setRight(rotateRight(root.getRight()));
+					return rotateLeft(root);
+				}
 			}
-			Parent.demote();
-			DeleteNode(node2delete);
-			return rebalance(Parent);
+			// no need for rotations :)
+			return root;
 		}
-		// if we get here, it means that we want to delete a node with both right and left sons! we need to check the balance factor
-		IAVLNode node2switch;
-		IAVLNode switchParent;
-		if (Rson.getRank() > Lson.getRank()) { // the right tree needs to be smaller
-			node2switch = minimal(Rson);
-		}else {
-			node2switch = maximal(Lson);
-		}
-		switchParent = node2switch.getParent();
-		if (switchParent.getRight()==node2switch) {
-			switchParent.setRight(null);
-		}else {
-			switchParent.setLeft(null);
-		}
-		switchParent.demote();
-		if (Parent.getLeft()==node2delete) { //the node2delete is the left son of the parent
-			Parent.setLeft(node2switch);
-			node2switch.setParent(Parent);	
-		}else { //the node2delete is the right son of the parent
-			Parent.setRight(node2switch);
-			node2switch.setParent(Parent);	
-		}	
-		DeleteNode(node2delete);
-		return rebalance(switchParent); // we need to rebalance from the root
-	}
-		private IAVLNode maximal(IAVLNode node) { //returns the maximal node in the subtree of the root "node"
-			while (node.getRight().isRealNode()) {
-				node = node.getRight();
-			}
-			return node;
 	}
 
-		private IAVLNode minimal(IAVLNode node) { //returns the minimal node in the subtree of the root "node"
+		private IAVLNode successor(IAVLNode node) { // returns the successor of node
 		while (node.getLeft().isRealNode()) {
 			node = node.getLeft();
 		}
 		return node;
 	}
-
-		/** delete(node){
-		 * sets node's parent, left son and right son to <-- null
-		 * 
-		 */
-	
-	private void DeleteNode (IAVLNode node) {
-		node.setLeft(null);
-		node.setRight(null);
-		node.setParent(null);
-	}
+		
+		private int Bfactor(IAVLNode node){  // returns the balance factor between node.left to node.right
+	        if (!node.isRealNode()) { 
+	            return 0;}
+	        return (node.getLeft().getHeight() - node.getRight().getHeight());
+	    }  
 	
 
 	/**
@@ -435,6 +419,14 @@ public class AVLTree {
 		return this.root;
 	}
 
+	// returns the height of the tree, 0 if it's empty
+	public int getHeight() {
+		if (this.empty()) {
+			return 0;
+		}
+		return this.getRoot().getHeight();
+	}
+
 	/**
 	 * public string split(int x)
 	 *
@@ -476,8 +468,85 @@ public class AVLTree {
 	 * (|tree.rank - t.rank| + 1). precondition: keys(x,t) < keys() or keys(x,t) >
 	 * keys(). t/tree might be empty (rank = -1). postcondition: none
 	 */
-	public int join(IAVLNode x, AVLTree t) {
-		return 0;
+		public int join(IAVLNode x, AVLTree t) {
+		int valtoreturn = Math.abs(this.getHeight()-t.getHeight()) +1;
+		if (t.empty()) {
+			// t is empty. we can just insert x to this
+			this.insert(x.getKey(), x.getValue());
+			return valtoreturn;
+		}
+		if (this.empty()) {
+			// tree is empty. we can just insert x to t and set tree.root <--- t.root
+			t.insert(x.getKey(), x.getValue());
+			this.root = t.root;
+			return valtoreturn;
+		}
+
+		// t && tree are not empty
+		
+		// lets check witch tree should be on which side
+		AVLTree Rtree;
+		AVLTree Ltree;
+		if (this.getRoot().getKey()>x.getKey()) {
+			Rtree = this;
+			Ltree = t;
+		}else {
+			Ltree = this;
+			Rtree = t;
+		}
+		// now lets check which tree is higher
+		int heightdiff = Rtree.getRoot().getHeight() - Ltree.getRoot().getHeight();
+		if (heightdiff==0) {
+			//trees are equal in height
+			x.setRight(Rtree.getRoot());
+			x.setRight(Ltree.getRoot());
+			this.root=x;
+			return 1;
+		}
+		IAVLNode temp = null;
+		if (heightdiff> 0) {
+			//Rtree is taller than Ltree
+			temp = Rtree.root;
+			while (temp.getHeight()>Ltree.getRoot().getHeight()) {
+				temp = temp.getLeft();
+			}
+			/* set x to be:
+			 *  	         temp.parent
+			 *	     		/
+			 *      	   x
+			 *     		 /   \
+			 * Ltree.root     temp
+			 */
+			x.setParent(temp.getParent());
+			x.setLeft(Ltree.getRoot());
+			x.setRight(temp);
+			x.getParent().setLeft(x);
+			x.getLeft().setParent(x);
+			x.getRight().setParent(x);
+			x.getLeft().updatePath();
+			
+		}else {
+			//Ltree is taller than Rtree
+			temp = Ltree.root;
+			while (temp.getHeight()>Rtree.getRoot().getHeight()) {
+				temp = temp.getRight();
+			}
+			/* set x to be:
+			 * temp.parent
+			 *	     \
+			 *        x
+			 *      /   \
+			 *  temp      Rtree.root
+			 */
+			x.setParent(temp.getParent());
+			x.setRight(Rtree.getRoot());
+			x.setLeft(temp);
+			x.getParent().setRight(x);
+			x.getRight().setParent(x);
+			x.getLeft().setParent(x);
+			x.getRight().updatePath();
+		}
+		return valtoreturn;
 	}
 
 	public IAVLNode rotateRight(IAVLNode node) {
