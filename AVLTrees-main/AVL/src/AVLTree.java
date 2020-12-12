@@ -183,7 +183,7 @@ public class AVLTree {
 		if (root.getKey()<k) {		
 			// we need to turn right
 			root.setRight(DelRec(k, root.getRight(), counter));}
-		if (root.getKey()==k) {		
+		// else (root.getKey()==k) 		
 			// we found the node to delete!
 			
 			if (!root.getLeft().isRealNode() || !root.getRight().isRealNode()) {
@@ -233,7 +233,10 @@ public class AVLTree {
 			
 			// update the height and size
 			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
-			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
+			//((AVLNode) root).setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
+			/**
+			 * we need to update the size field without making a mess
+			 */
 			
 			// calc balance factor
 			int bala = Bfactor(root);
@@ -265,7 +268,7 @@ public class AVLTree {
 			}
 			// no need for rotations :)
 			return root;
-		}
+		
 	}
 
 		private IAVLNode successor(IAVLNode node) { // returns the successor of node
@@ -545,6 +548,8 @@ public class AVLTree {
 			// tree is empty. we can just insert x to t and set tree.root <--- t.root
 			t.insert(x.getKey(), x.getValue());
 			this.root = t.root;
+			this.max = t.max;
+			this.min = t.min;
 			return valtoreturn;
 		}
 
@@ -567,6 +572,8 @@ public class AVLTree {
 			x.setRight(Rtree.getRoot());
 			x.setRight(Ltree.getRoot());
 			this.root=x;
+			this.max = Rtree.max;
+			this.min = Ltree.min;
 			return 1;
 		}
 		IAVLNode temp = null;
@@ -612,6 +619,8 @@ public class AVLTree {
 			x.getLeft().setParent(x);
 			x.getRight().updatePath();
 		}
+		this.max = Rtree.max;
+		this.min = Ltree.min;
 		return valtoreturn;
 	}
 
