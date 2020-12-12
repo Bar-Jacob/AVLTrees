@@ -383,7 +383,7 @@ public class AVLTree {
 		if (this.empty() == true) {
 			return keysArray;
 		}
-
+		
 		List<IAVLNode> inOrderNodeList = new LinkedList<IAVLNode>();
 		this.inOrderList(this.getRoot(), inOrderNodeList);
 
@@ -394,7 +394,14 @@ public class AVLTree {
 		}
 		return keysArray;
 	}
+	
 
+	/**
+	 * private void inOrderList(IAVLNode node, List<IAVLNode> inOrderNodeList)
+	 *
+	 * adds nodes to a linked list, in an "in order walk" order
+	 */
+	
 	private void inOrderList(IAVLNode node, List<IAVLNode> inOrderNodeList) {
 
 		if (!node.isRealNode()) {
@@ -468,31 +475,58 @@ public class AVLTree {
 	 * none
 	 */
 	public AVLTree[] split(int x) {
-		return null;
+		IAVLNode xNode = findPosition(this.getRoot(),x);
+		return this.split(x, xNode);
 	}
 	
 	private AVLTree[] split(int x, IAVLNode node) {
-		
 		IAVLNode pNode = node;
 		AVLTree[] result = new AVLTree[2];
 
 		result[0] = new AVLTree();	//smaller than x
 		result[1] = new AVLTree();	//bigger than x
 		
+		//set x's right and left subtrees as the base of the 2 new trees
 		result[0].root = node.getLeft();
 		result[1].root = node.getRight();
 		pNode = node.getParent();
 		
-		while(node != null) {
-			if(pNode.getKey() < x) {
-				
-				result[0] = this.join(pNode, result[0]);
-			}
-		}
+		//disconnect x's children + parent
+		disconnectNode(node);
+		
+		while(pNode != null) {
+			IAVLNode duplicatePNode = new AVLNode(pNode.getKey(), pNode.getValue());
 			
+			//adding to the smaller tree
+			if(pNode.getKey() < x) {
+				AVLTree smaller = new AVLTree();
+				smaller.root = pNode.getLeft();
+				smaller.root.setParent(null);
+				smaller.join(duplicatePNode, result[0]);
+				result[0] = smaller;
+				
+			}else {
+				//adding to the bigger tree
+				AVLTree bigger = new AVLTree();
+				bigger.root = pNode.getRight();
+				bigger.root.setParent(null);
+				result[1].join(duplicatePNode, bigger);
+				result[1] = bigger;
+			}
+			
+			pNode = pNode.getParent();
+			}
+		
+		return result;
+		
+	}	
+	
+	private void disconnectNode(IAVLNode node){
+		node.setLeft(new AVLNode());
+		node.setRight(new AVLNode());
+		node.setParent(null);
 		
 	}
-
 	/**
 	 * public join(IAVLNode x, AVLTree t)
 	 *
@@ -600,7 +634,9 @@ public class AVLTree {
 
 		// rotate
 		node.setLeft(leftNode.getRight());
+		leftNode.getRight().setParent(node);
 		leftNode.setRight(node);
+		node.setParent(leftNode);
 
 		// sizes and heights update
 		node.update();
@@ -627,7 +663,9 @@ public class AVLTree {
 
 		// rotate
 		node.setRight(rightNode.getLeft());
+		rightNode.getLeft().setParent(node);
 		rightNode.setLeft(node);
+		node.setParent(rightNode);
 
 		// sizes and heights update
 		node.update();
@@ -675,7 +713,8 @@ public class AVLTree {
 		public int rankDiffRight(); // returns rank difference between the node and it's right child
 		public int rankDiffLeft(); // returns rank difference between the node and it's left child
 		public void update(); // update node's height and size
-		public void updatePath(); // update the eight and size of the path from the the giving node to the root
+		public void updatePath(); // update the height and size of the path from the the giving node to the root
+		public void setSize(int i); //sets the node's new size
 	}
 
 	/**
@@ -728,7 +767,7 @@ public class AVLTree {
 		}
 
 		public IAVLNode getLeft() {
-			if (this.left == null || this.left.getValue() == "-1") {
+			if (!this.isRealNode()) {
 				return null;
 			}
 			return this.left; // returns the left child of the node if it has one, or null otherwise
@@ -739,7 +778,7 @@ public class AVLTree {
 		}
 
 		public IAVLNode getRight() {
-			if (this.right == null || this.right.getKey() == -1) {
+			if (!this.isRealNode()) {
 				return null;
 			}
 			return this.right; // returns the right child of the node if it has one, or null otherwise
@@ -790,17 +829,14 @@ public class AVLTree {
 			if (this.isRealNode() == false) {
 				return 0;
 			}
-			System.out.println(this.rank);
-			System.out.println(this.right.rank);
-			System.out.println(this.getRank() - this.getRight().getRank());
-			return (this.getRank() - this.getRight().getRank());
+			return (this.rank - this.right.rank);
 		}
 
 		public int rankDiffLeft() {
 			if (this.isRealNode() == false) {
 				return 0;
 			}
-			return this.rank - this.getLeft().getRank();
+			return this.rank - this.left.rank;
 		}
 
 		public void update() {

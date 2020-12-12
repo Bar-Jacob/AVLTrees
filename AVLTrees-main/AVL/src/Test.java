@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Test {
 	
 	static int COUNT = 10;
@@ -34,10 +36,22 @@ public class Test {
 	}
 	
 	public static void main(String[] args) {	
-		// TODO Auto-generated method stub
 		AVLTree tree = new AVLTree();
-		tree.insert(1, "omg");
-		print2D(tree.getRoot());
+		for(int i = 0; i < 20; i++) {
+			tree.insert(i, ""+i);
+		}
+//		print2D(tree.getRoot());
+		int exist = tree.insert(1, "omg");
+		System.out.println(exist);
+		int[] keysToArray = tree.keysToArray();
+		String[] infoToArray = tree.infoToArray();
+		System.out.println(Arrays.toString(keysToArray));
+		System.out.println(Arrays.toString(infoToArray));
+		
+//		AVLTree[] splitted = tree.split(10);
+//		print2D(splitted[0].getRoot());
+//		System.out.println("************************");
+//		print2D(splitted[1].getRoot());
 	}
 
 }
