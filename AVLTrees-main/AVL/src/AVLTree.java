@@ -35,7 +35,7 @@ public class AVLTree {
 	 */
 	public String search(int k) {
 		IAVLNode node = SearchNode(k);
-		if (node.isRealNode()) {
+		if (node!=null && node.isRealNode()) {
 			return node.getValue();
 		}
 		return null;
@@ -150,6 +150,15 @@ public class AVLTree {
 	 * - counted as one rebalnce operation, double-rotation is counted as 2. returns
 	 * -1 if an item with key k was not found in the tree.
 	 */
+		/**
+	 * public int delete(int k)
+	 *
+	 * deletes an item with key k from the binary tree, if it is there; the tree
+	 * must remain valid (keep its invariants). returns the number of rebalancing
+	 * operations, or 0 if no rebalancing operations were needed. demotion/rotation
+	 * - counted as one rebalnce operation, double-rotation is counted as 2. returns
+	 * -1 if an item with key k was not found in the tree.
+	 */
 	public int delete(int k) {
 		int binarymax=0;
 		int binarymin=0;
@@ -162,14 +171,18 @@ public class AVLTree {
 		int counter =0;
 		if (this.search(k)==null) {
 			return -1;}
-		DelRec(k, this.root, counter);
+		this.root=DelRec(k, this.root, counter);
+		if (this.root==virtualLeaf) {
+			this.root = null;
+		}
 		if (binarymax==1) {
 			updatemax();}
 		if (binarymin==1) {
 			updatemin();}
 		return counter;
 		}
-	// a recursive deletion function
+	
+	// a recursive deletion function, returns the node on the right/left with it's subtree balanced and without node k
 	private IAVLNode DelRec(int k,IAVLNode root, int counter) {
 		// First we find the node recursively
 		if (!root.isRealNode()) {
@@ -180,65 +193,51 @@ public class AVLTree {
 		if (root.getKey()<k) {		
 			// we need to turn right
 			root.setRight(DelRec(k, root.getRight(), counter));}
-		// else (root.getKey()==k) 		
+		if(root.getKey()==k) {		
 			// we found the node to delete!
 			
 			if (!root.getLeft().isRealNode() || !root.getRight().isRealNode()) {
 				// node has one or zero sons
-				IAVLNode temp = null;
-				if (!root.getLeft().isRealNode()) { // we need to find if the node has a real son
-					temp = root.getRight();
-				}else {
+				IAVLNode temp = virtualLeaf;
+				if (root.getLeft().isRealNode()) { // we need to find if the node has a real son
 					temp = root.getLeft();
+				}else {
+					temp = root.getRight();
 				}
 				if (!temp.isRealNode()) {
 					// root doesn't have kids
-					temp = root;
-					root = virtualLeaf;				 //**********************************virtual
+					root= virtualLeaf;
+
 				}else {
-					root = temp; // root is switched with it's son
+					root= temp;
 				}
 			}else {
 				//node has two sons
 				// first we'll find it's successor
 				IAVLNode successor = successor(root);
 				// now lets switch them
-				IAVLNode temp = root.getLeft();
-				root.setLeft(successor.getLeft());
-				successor.setLeft(temp);
-				temp = root.getRight();
-				root.setRight(successor.getRight());
-				successor.setRight(temp);
-				if (root.getParent().getKey() >root.getKey()) {
-					//root is it's parent's left son
-					root.getParent().setLeft(successor);
-				}else {
-					//root is it's parent's right son
-					root.getParent().setRight(successor);
-				}
-				temp = successor;
-				successor= root;
-				root = temp;
-				// now the root and it's successor are switched. lets delete the temp (=root) node from the right subtree recursively
-				root.setRight(DelRec(temp.getKey(), root.getRight(), counter));
-				
+				Switch(root, successor);
+								
+				// now the root and it's successor are switched. lets delete the the root node from the right subtree recursively
+				successor.setRight(DelRec(k, successor.getRight(), counter));
+				root = successor;
 			}
+		}
 			
 			if(!root.isRealNode()) {		// this means our tree only had one node
 				return root;
 			}
 			
-			// update the height and size
+			// update the height, size and rank of the node
 			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
-			//((AVLNode) root).setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
-			/**
-			 * we need to update the size field without making a mess
-			 */
+			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
+			root.calcRank();
 			
 			// calc balance factor
 			int bala = Bfactor(root);
 			
-			// now to check if we need to re balance:
+			// let's check if we need to rebalance our subtree
+//			System.out.println("we need to balance node "+root.getKey());
 			if (bala>1) {
 				if (Bfactor(root.getLeft())<0) {
 					// Left Right rotation
@@ -263,12 +262,73 @@ public class AVLTree {
 					return rotateLeft(root);
 				}
 			}
+			
 			// no need for rotations :)
 			return root;
 		
 	}
 
+				private void Switch(IAVLNode n, IAVLNode s) {
+		if (n.getRight()==s) {
+			if (this.getRoot()==n) {
+				s.setParent(null);
+				this.root = s;
+				n.setParent(s);
+			}else {
+				s.setParent(n.getParent());
+				n.setParent(s);
+			}
+
+			n.setRight(s.getRight());
+			s.setRight(n);
+			IAVLNode temp = s.getLeft();
+			s.setLeft(n.getLeft());
+			n.setLeft(temp);
+			s.getLeft().setParent(s);
+			n.getLeft().setParent(n);
+		}else {
+			//switching left sons
+			IAVLNode temp = s.getLeft();
+			s.setLeft(n.getLeft());
+			n.setLeft(temp);
+			s.getLeft().setParent(s);
+			n.getLeft().setParent(n);
+			//switching Right sons
+			temp = s.getRight();
+			s.setRight(n.getRight());
+			n.setRight(temp);
+			s.getRight().setParent(s);
+			n.getRight().setParent(n);
+			//switching Parents
+			temp = s.getParent();
+			if (this.getRoot()==n) {
+				s.setParent(null);
+				this.root = s;
+			}else {
+				s.setParent(n.getParent());
+				if (s.getParent().getKey()>n.getKey()) {
+					s.getParent().setLeft(s);
+				}else {
+					s.getParent().setRight(s);
+				}
+			}
+			n.setParent(temp);
+			if (temp==null) {
+				//it means s was the root!
+				this.root= n;
+			}else {
+				if (n.getParent().getKey()>s.getKey()) {
+					n.getParent().setLeft(n);
+				}else {
+					n.getParent().setRight(n);
+				}
+			}
+		}
+		
+	}
+
 		private IAVLNode successor(IAVLNode node) { // returns the successor of node
+			node = node.getRight();
 		while (node.getLeft().isRealNode()) {
 			node = node.getLeft();
 		}
@@ -280,6 +340,7 @@ public class AVLTree {
 	            return 0;}
 	        return (node.getLeft().getHeight() - node.getRight().getHeight());
 	    }  
+ 
  
 	
 
