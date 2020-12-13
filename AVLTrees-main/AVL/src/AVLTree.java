@@ -172,6 +172,9 @@ public class AVLTree {
 		if (this.search(k)==null) {
 			return -1;}
 		this.root=DelRec(k, this.root, counter);
+		if (this.root==virtualLeaf) {
+			this.root = null;
+		}
 		if (binarymax==1) {
 			updatemax();}
 		if (binarymin==1) {
@@ -267,8 +270,7 @@ public class AVLTree {
 		
 	}
 
-		private void Switch(IAVLNode n, IAVLNode s) {
-			System.out.println("switching "+ n.getKey()+" with "+s.getKey());
+				private void Switch(IAVLNode n, IAVLNode s) {
 		if (n.getRight()==s) {
 			if (this.getRoot()==n) {
 				s.setParent(null);
@@ -278,18 +280,11 @@ public class AVLTree {
 				s.setParent(n.getParent());
 				n.setParent(s);
 			}
-			
-			//correcting the parents
-//			if (s.getParent().getKey()>n.getKey()) {
-//				s.getParent().setLeft(s);
-//			}else {
-//				s.getParent().setRight(s);
-//			}
+
 			n.setRight(s.getRight());
 			s.setRight(n);
 			IAVLNode temp = s.getLeft();
 			s.setLeft(n.getLeft());
-			System.out.println("for node successor "+s.getKey()+" the left son is now "+s.getLeft().getKey());
 			n.setLeft(temp);
 			s.getLeft().setParent(s);
 			n.getLeft().setParent(n);
@@ -309,7 +304,6 @@ public class AVLTree {
 			//switching Parents
 			temp = s.getParent();
 			if (this.getRoot()==n) {
-				System.out.println( n.getKey()+"'s parent should be null cause it's the root!");
 				s.setParent(null);
 				this.root = s;
 			}else {
