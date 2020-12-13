@@ -228,12 +228,10 @@ public class AVLTree {
 				return root;
 			}
 			
-			// update the height and size
+			// update the height, size and rank of the node
 			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
 			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
-			/**
-			 * we need to update the Rank field without making a mess
-			 */
+			root.calcRank();
 			
 			// calc balance factor
 			int bala = Bfactor(root);
