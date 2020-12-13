@@ -2,9 +2,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import AVLTree.AVLNode;
-import AVLTree.IAVLNode;
-
 /**
  *
  * AVLTree
@@ -80,7 +77,6 @@ public class AVLTree {
 			}
 			newNode.setParent(position);
 		}
-		newNode.updatePath();
 		return rebalance(newNode);
 
 	}
@@ -138,6 +134,7 @@ public class AVLTree {
 				}
 
 			}
+			newNode.updatePath();
 			node = node.getParent();
 		}
 		return cnt;
@@ -552,10 +549,9 @@ public class AVLTree {
 			this.min = t.min;
 			return valtoreturn;
 		}
-
 		// t && tree are not empty
 		
-		// lets check witch tree should be on which side
+		// lets check which tree should be on which side
 		AVLTree Rtree;
 		AVLTree Ltree;
 		if (this.getRoot().getKey()>x.getKey()) {
@@ -570,19 +566,22 @@ public class AVLTree {
 		if (heightdiff==0) {
 			//trees are equal in height
 			x.setRight(Rtree.getRoot());
-			x.setRight(Ltree.getRoot());
+			x.setLeft(Ltree.getRoot());
 			this.root=x;
+			x.update();
+			x.calcRank();
 			this.max = Rtree.max;
 			this.min = Ltree.min;
 			return 1;
-		}
-		IAVLNode temp = null;
-		if (heightdiff> 0) {
+			
+		}else if (heightdiff> 0) {
 			//Rtree is taller than Ltree
+			IAVLNode temp = null;
 			temp = Rtree.root;
 			while (temp.getHeight()>Ltree.getRoot().getHeight()) {
 				temp = temp.getLeft();
 			}
+			
 			/* set x to be:
 			 *  	         temp.parent
 			 *	     		/
@@ -592,14 +591,19 @@ public class AVLTree {
 			 */
 			x.setParent(temp.getParent());
 			x.setLeft(Ltree.getRoot());
-			x.setRight(temp);
-			x.getParent().setLeft(x);
 			x.getLeft().setParent(x);
+			x.setRight(temp);
 			x.getRight().setParent(x);
-			x.getLeft().updatePath();
+			x.getParent().setLeft(x);
+			this.root = Rtree.getRoot();
+			x.updatePath();
+			x.calcRank();
+			System.out.println("rank x is " + x.getRank());
+			this.rebalance(x);
 			
 		}else {
 			//Ltree is taller than Rtree
+			IAVLNode temp = null;
 			temp = Ltree.root;
 			while (temp.getHeight()>Rtree.getRoot().getHeight()) {
 				temp = temp.getRight();
@@ -611,13 +615,17 @@ public class AVLTree {
 			 *      /   \
 			 *  temp      Rtree.root
 			 */
+			this.root = Ltree.getRoot();
 			x.setParent(temp.getParent());
 			x.setRight(Rtree.getRoot());
 			x.setLeft(temp);
 			x.getParent().setRight(x);
 			x.getRight().setParent(x);
 			x.getLeft().setParent(x);
-			x.getRight().updatePath();
+			x.updatePath();
+			x.calcRank();
+			this.rebalance(x);
+			
 		}
 		this.max = Rtree.max;
 		this.min = Ltree.min;
@@ -724,6 +732,7 @@ public class AVLTree {
 		public void update(); // update node's height and size
 		public void updatePath(); // update the height and size of the path from the the giving node to the root
 		public void setSize(int i); //sets the node's new size
+		public void calcRank(); //calc node's rank according to it's height
 	}
 
 	/**
@@ -813,6 +822,9 @@ public class AVLTree {
 		public int getHeight() {
 			return this.height; // to be replaced by student code
 		}
+		public void calcRank() {
+			this.rank = 1 + Math.max(this.left.height, this.right.height);
+		}
 
 		public int getSize() {
 			return this.size;
@@ -857,7 +869,6 @@ public class AVLTree {
 			if (this.left.isRealNode()) { // adding left subtree size
 				this.size += this.left.size;
 			}
-
 			this.height = 1 + Math.max(this.left.height, this.right.height);
 		}
 
