@@ -183,7 +183,7 @@ public class AVLTree {
 		}
 	
 	// a recursive deletion function, returns the node on the right/left with it's subtree balanced and without node k
-	private IAVLNode DelRec(int k,IAVLNode root, int counter) {
+		private IAVLNode DelRec(int k,IAVLNode root, int counter) {
 		// First we find the node recursively
 		if (!root.isRealNode()) {
 			return root;} 			// recursion end
@@ -207,8 +207,9 @@ public class AVLTree {
 				if (!temp.isRealNode()) {
 					// root doesn't have kids
 					root= virtualLeaf;
-
+					root.getParent().demote();
 				}else {
+					root.getParent().demote();
 					root= temp;
 				}
 			}else {
@@ -217,10 +218,10 @@ public class AVLTree {
 				IAVLNode successor = successor(root);
 				// now lets switch them
 				Switch(root, successor);
-								
 				// now the root and it's successor are switched. lets delete the the root node from the right subtree recursively
 				successor.setRight(DelRec(k, successor.getRight(), counter));
 				root = successor;
+				root.calcRank();
 			}
 		}
 			
@@ -231,12 +232,101 @@ public class AVLTree {
 			// update the height, size and rank of the node
 			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
 			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
-			root.calcRank();
+//			root.calcRank();
 			
 			// calc balance factor
 			int bala = Bfactor(root);
 			
 			// let's check if we need to rebalance our subtree
+			int rdl = root.rankDiffLeft();
+			int rdr = root.rankDiffRight();
+			/**
+			if (rdl==0) {
+				if(rdr==0) {
+					root.promote();
+					counter++;
+					return root;
+				}
+				if(rdr==1) {
+					return root;
+				}
+				if(rdr==2) {
+					
+				}
+			}
+			
+			if (rdr==0) {
+				if(rdr==1) {
+					return root;
+				}
+			}
+			*/
+			if (rdl==2 && rdr==2) {
+				root.demote();
+				counter++;
+				return root;
+			}
+			if (rdl==2 && rdr==1) {
+				return root;
+			}
+			if (rdl==1 && rdr==2) {
+				return root;
+			}
+			if (rdl==3 && rdr==1) {
+				IAVLNode y = root.getRight();
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==1) {
+					rotateLeft(y);
+					root.demote();
+					y.promote();
+					counter+=3;
+					return y;
+				}
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==2) {
+					rotateLeft(rotateRight(y.getLeft()));
+					root.demote();
+					root.demote();
+					y.demote();
+					y.getParent().promote();
+					counter+=6;
+					return y.getParent();
+				}
+				if(y.rankDiffLeft()==2 && y.rankDiffRight()==1) {
+					rotateLeft(y);
+					root.demote();
+					root.demote();
+					counter+=3;
+					return y;
+				}
+				
+			}
+			if (rdl==1 && rdr==3) {
+				IAVLNode y = root.getLeft();
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==1) {
+					rotateRight(y);
+					root.demote();
+					y.promote();
+					counter+=3;
+					return y;
+				}
+				if(y.rankDiffLeft()==2 && y.rankDiffRight()==1) {
+					rotateRight(rotateLeft(y.getRight()));
+					root.demote();
+					root.demote();
+					y.demote();
+					y.getParent().promote();
+					counter+=6;
+					return y.getParent();
+				}
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==2) {
+					rotateRight(y);
+					root.demote();
+					root.demote();
+					counter+=3;
+					return y;
+				}
+				
+			}
+			/**
 //			System.out.println("we need to balance node "+root.getKey());
 			if (bala>1) {
 				if (Bfactor(root.getLeft())<0) {
@@ -262,7 +352,7 @@ public class AVLTree {
 					return rotateLeft(root);
 				}
 			}
-			
+			*/
 			// no need for rotations :)
 			return root;
 		
