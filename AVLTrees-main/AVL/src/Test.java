@@ -44,15 +44,28 @@ public class Test{
 			tree.insert(i, ""+i);
 		}
 		
-		AVLTree tree2 = new AVLTree();
-		for(int i = 0; i < 1; i++) {
-			tree2.insert(i, ""+i);
-		}
+//		for(int i = 20; i > 4; i--) {
+//			tree.delete(i);
+//		}
+//		
+		
 
-		AVLTree tree3 = new AVLTree();
-		tree3.insert(2, ""+2);
-
+		
+//		AVLTree tree2 = new AVLTree();
+//		for(int i = 0; i < 1; i++) {
+//			tree2.insert(i, ""+i);
+//		}
+//
+//		AVLTree tree3 = new AVLTree();
+//		tree3.insert(2, ""+2);
+		
+		AVLTree[] splitted = tree.split(20);
+		print2D(splitted[0].getRoot());
+		System.out.println("************************");
+		print2D(splitted[1].getRoot());
+		
 //		print2D(tree.getRoot());
+
 //		System.out.println("*************");
 //		print2D(tree2.getRoot());
 //		
@@ -60,10 +73,10 @@ public class Test{
 //		tree.join(tree3.getRoot(), tree2);
 //		print2D(tree.getRoot());
 		
-		AVLTree[] splitted = tree.split(10);
-		print2D(splitted[0].getRoot());
-		System.out.println("************************");
-		print2D(splitted[1].getRoot());
+//		AVLTree[] splitted = tree.split(10);
+//		print2D(splitted[0].getRoot());
+//		System.out.println("************************");
+//		print2D(splitted[1].getRoot());
 
 		
 //		int exist = tree.insert(1, "omg");
