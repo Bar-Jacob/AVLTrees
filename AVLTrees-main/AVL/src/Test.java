@@ -40,17 +40,19 @@ public class Test{
 	public static void main(String[] args) {
 		
 		AVLTree tree = new AVLTree();
-		for(int i = 20; i > 4; i--) {
-			tree.insert(i, ""+i);
-		}
+//		for(int i = 20; i > 0; i--) {
+//			tree.insert(i, ""+i);
+//		}
+//		
+//		for(int i = 20; i > 5; i--) {
+//			tree.delete(i);
+//		}
 		
-		for(int i = 20; i > 5; i--) {
-			tree.delete(i);
-		}
+//		print2D(tree.getRoot());
 		
-		print2D(tree.getRoot());
-		
-		
+		int[] keysToArray = tree.keysToArray();
+		String[] infoToArray = tree.infoToArray();
+		System.out.println(Arrays.toString(keysToArray));
 
 		
 //		AVLTree tree2 = new AVLTree();

@@ -170,7 +170,7 @@ public class AVLTree {
 	 * - counted as one rebalnce operation, double-rotation is counted as 2. returns
 	 * -1 if an item with key k was not found in the tree.
 	 */
-		public int delete(int k) {
+	public int delete(int k) {
 		// first, we need to check if we're deleting a saved field(min/max)
 		int [] binaryminmax= {0,0};
 		if (this.min.getKey()==k) {
@@ -318,6 +318,7 @@ public class AVLTree {
 		
 	}
 	
+	
 
 	private IAVLNode Lrotate(IAVLNode y) {
 			IAVLNode z = y.getParent();
@@ -362,12 +363,12 @@ public class AVLTree {
 	}
 
 	private void Switch(IAVLNode n, IAVLNode s) {
-		if (n.getRight() == s) {
-			if (this.getRoot() == n) {
+		if (n.getRight()==s) {
+			if (this.getRoot()==n) {
 				s.setParent(null);
 				this.root = s;
 				n.setParent(s);
-			} else {
+			}else {
 				s.setParent(n.getParent());
 				n.setParent(s);
 			}
@@ -379,63 +380,55 @@ public class AVLTree {
 			n.setLeft(temp);
 			s.getLeft().setParent(s);
 			n.getLeft().setParent(n);
-		} else {
-			// switching left sons
+		}else {
+			//switching left sons
 			IAVLNode temp = s.getLeft();
 			s.setLeft(n.getLeft());
 			n.setLeft(temp);
 			s.getLeft().setParent(s);
 			n.getLeft().setParent(n);
-			// switching Right sons
+			//switching Right sons
 			temp = s.getRight();
 			s.setRight(n.getRight());
 			n.setRight(temp);
 			s.getRight().setParent(s);
 			n.getRight().setParent(n);
-			// switching Parents
+			//switching Parents
 			temp = s.getParent();
-			if (this.getRoot() == n) {
+			if (this.getRoot()==n) {
 				s.setParent(null);
 				this.root = s;
-			} else {
+			}else {
 				s.setParent(n.getParent());
-				if (s.getParent().getKey() > n.getKey()) {
+				if (s.getParent().getKey()>n.getKey()) {
 					s.getParent().setLeft(s);
-				} else {
+				}else {
 					s.getParent().setRight(s);
 				}
 			}
 			n.setParent(temp);
-			if (temp == null) {
-				// it means s was the root!
-				this.root = n;
-			} else {
-				if (n.getParent().getKey() > s.getKey()) {
+			if (temp==null) {
+				//it means s was the root!
+				this.root= n;
+			}else {
+				if (n.getParent().getKey()>s.getKey()) {
 					n.getParent().setLeft(n);
-				} else {
+				}else {
 					n.getParent().setRight(n);
 				}
 			}
 		}
-
+		
 	}
 
-	private IAVLNode successor(IAVLNode node) { // returns the successor of node
-		node = node.getRight();
+		private IAVLNode successor(IAVLNode node) { // returns the successor of node
+			node = node.getRight();
 		while (node.getLeft().isRealNode()) {
 			node = node.getLeft();
 		}
 		return node;
 	}
 
-	private int Bfactor(IAVLNode node) { // returns the balance factor between node.left to node.right
-		if (!node.isRealNode()) {
-			return 0;
-		}
-		return (node.getLeft().getHeight() - node.getRight().getHeight());
-	}
- 
-	
 
 	/**
 	 * SearchNode(int k):
@@ -532,11 +525,14 @@ public class AVLTree {
 	 * if the tree is empty.
 	 */
 	public int[] keysToArray() {
-		int[] keysArray = new int[this.getRoot().getSize()];
+		
+		int[] keysArray = new int[0];
 
-		if (this.empty() == true) {
+		if (this.empty()) {
 			return keysArray;
 		}
+		
+		keysArray = new int[this.getRoot().getSize()];
 		
 		List<IAVLNode> inOrderNodeList = new LinkedList<IAVLNode>();
 		this.inOrderList(this.getRoot(), inOrderNodeList);
@@ -574,10 +570,14 @@ public class AVLTree {
 	 * respective keys, or an empty array if the tree is empty.
 	 */
 	public String[] infoToArray() {
-		String[] infoArray = new String[this.getRoot().getSize()];
+		
+		String[] infoArray = new String[0];
+		
 		if (this.empty() == true) {
 			return infoArray;
 		}
+		
+		infoArray = new String[this.getRoot().getSize()];
 
 		List<IAVLNode> inOrderNodeList = new LinkedList<IAVLNode>();
 		this.inOrderList(this.getRoot(), inOrderNodeList);
