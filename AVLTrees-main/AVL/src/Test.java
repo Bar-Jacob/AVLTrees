@@ -2,9 +2,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import src.MeasureAVL.IAVLNode;
-
-
 public class Test{
 	
 	static int COUNT = 10;
@@ -43,31 +40,31 @@ public class Test{
 	public static void main(String[] args) {
 		
 		AVLTree tree = new AVLTree();
-		for(int i = 20; i > 0; i--) {
+		for(int i = 20; i > 4; i--) {
 			tree.insert(i, ""+i);
 		}
+		
+		AVLTree tree2 = new AVLTree();
+		for(int i = 0; i < 1; i++) {
+			tree2.insert(i, ""+i);
+		}
 
-		print2D(tree.getRoot());
-		
-		
-//		AVLTree tree2 = new AVLTree();
-//		for(int i = 3; i < 10; i++) {
-//			tree2.insert(i, ""+i);
-//		}
-		
+		AVLTree tree3 = new AVLTree();
+		tree3.insert(2, ""+2);
+
 //		print2D(tree.getRoot());
 //		System.out.println("*************");
 //		print2D(tree2.getRoot());
 //		
-//		AVLTree tree3 = new AVLTree();
-//		tree3.insert(2, ""+2);
-//		print2D(tree.getRoot());
-//		System.out.println("***********");
-//		print2D(tree2.getRoot());
-//
+		
 //		tree.join(tree3.getRoot(), tree2);
 //		print2D(tree.getRoot());
-//		
+		
+		AVLTree[] splitted = tree.split(10);
+		print2D(splitted[0].getRoot());
+		System.out.println("************************");
+		print2D(splitted[1].getRoot());
+
 		
 //		int exist = tree.insert(1, "omg");
 //		System.out.println(exist);
@@ -84,10 +81,6 @@ public class Test{
 //		System.out.println(tree.findPosition(tree.getRoot(), 5).getKey()); 
 //		System.out.println(tree.findPosition(tree.getRoot(), 20).getKey()); 
 		
-//		AVLTree[] splitted = tree.split(10);
-//		print2D(splitted[0].getRoot());
-//		System.out.println("************************");
-//		print2D(splitted[1].getRoot());
 	}
 
 
