@@ -171,160 +171,194 @@ public class AVLTree {
 	 */
 	public int delete(int k) {
 		// first, we need to check if we're deleting a saved field(min/max)
-		int[] binaryminmax = { 0, 0 };
-		if (this.min.getKey() == k) {
-			binaryminmax[0] = 1;
-		}
-		if (this.max.getKey() == k) {
-			binaryminmax[1] = 1;
-		}
+		int [] binaryminmax= {0,0};
+		if (this.min.getKey()==k) {
+			binaryminmax[0]=1;}
+		if (this.max.getKey()==k) {
+			binaryminmax[1]=1;}
 		// initializing a counter for rebalancing actions
-		int counter = 0;
-		if (this.search(k) == null) {
+		int counter =0;
+		if (this.search(k)==null) {
 			// there is no key with value k in the tree
-			return -1;
-		}
-		// starting recursive function
-		this.root = DelRec(k, this.root, counter);
-		if (this.root == virtualLeaf) {
-			// the tree is empty
+			return -1;}
+		//starting recursive function
+		this.root=DelRec(k, this.root, counter);
+		if (this.root==virtualLeaf) {
+			//the tree is empty
 			this.root = null;
 		}
-		// update lost values
-		if (binaryminmax[0] == 1) {
-			updatemin();
-		}
-		if (binaryminmax[1] == 1) {
-			updatemax();
-		}
+		// update lost values 
+		if (binaryminmax[0]==1) {
+			updatemin();}
+		if (binaryminmax[1]==1) {
+			updatemax();}
 		return counter;
-	}
-
-// a recursive deletion function, returns the node on the right/left with it's subtree balanced and without node k
-	private IAVLNode DelRec(int k, IAVLNode root, int counter) {
+		}
+	
+	// a recursive deletion function, returns the node on the right/left with it's subtree balanced and without node k
+	private IAVLNode DelRec(int k,IAVLNode root, int counter) {
 		// First we find the node recursively
 		if (!root.isRealNode()) {
-			return root;
-		} // recursion end
-		if (root.getKey() > k) {
+			return root;} 			// recursion end
+		if (root.getKey()>k) {		
 			// we need to turn left
-			root.setLeft(DelRec(k, root.getLeft(), counter));
-		}
-		if (root.getKey() < k) {
+			root.setLeft(DelRec(k, root.getLeft(), counter));}
+		if (root.getKey()<k) {		
 			// we need to turn right
-			root.setRight(DelRec(k, root.getRight(), counter));
-		}
-		if (root.getKey() == k) {
+			root.setRight(DelRec(k, root.getRight(), counter));}
+		if(root.getKey()==k) {		
 			// we found the node to delete!
-
 			if (!root.getLeft().isRealNode() || !root.getRight().isRealNode()) {
 				// node has one or zero sons
 				IAVLNode temp = virtualLeaf;
 				if (root.getLeft().isRealNode()) { // we need to find if the node has a real son
 					temp = root.getLeft();
-				} else {
+				}else {
 					temp = root.getRight();
 				}
 				if (!temp.isRealNode()) {
 					// root doesn't have kids
-					root = virtualLeaf;
-				} else {
-					root = temp;
+					root= virtualLeaf;
+				}else {
+					root= temp;
 				}
-			} else {
-				// node has two sons
+			}else {
+				//node has two sons
 				// first we'll find it's successor
 				IAVLNode successor = successor(root);
 				// now lets switch them
 				Switch(root, successor);
-				// now the root and it's successor are switched. lets delete the the root node
-				// from the right subtree recursively
+				// now the root and it's successor are switched. lets delete the the root node from the right subtree recursively
 				successor.setRight(DelRec(k, successor.getRight(), counter));
 				root = successor;
 			}
 		}
+			
+			if(!root.isRealNode()) {		// this means our tree only had one node
+				return root;
+			}
+			
+			// update the height anvd size of the node
+			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
+			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
 
-		if (!root.isRealNode()) { // this means our tree only had one node
+			// let's check if we need to rebalance our subtree
+			int rdl = root.rankDiffLeft();
+			int rdr = root.rankDiffRight();
+			
+			if (rdl==2 && rdr==2) {
+				root.demote();
+				counter++;
+				return root;
+			}
+			if (rdl==2 && rdr==1) {
+				return root;
+			}
+			if (rdl==1 && rdr==2) {
+				return root;
+			}
+			if (rdl==3 && rdr==1) {
+				IAVLNode y = root.getRight();
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==1) {
+					Lrotate(y);
+					root.demote();
+					y.promote();
+					counter+=3;
+					return y;
+				}
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==2) {
+					Lrotate(Rrotate(y.getLeft()));
+					root.demote();
+					root.demote();
+					y.demote();
+					y.getParent().promote();
+					counter+=6;
+					return y.getParent();
+				}
+				if(y.rankDiffLeft()==2 && y.rankDiffRight()==1) {
+					Lrotate(y);
+					root.demote();
+					root.demote();
+					counter+=3;
+					return y;
+				}
+				
+			}
+			if (rdl==1 && rdr==3) {
+				IAVLNode y = root.getLeft();
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==1) {
+					Rrotate(y);
+					root.demote();
+					y.promote();
+					counter+=3;
+					return y;
+				}
+				if(y.rankDiffLeft()==2 && y.rankDiffRight()==1) {
+					Rrotate(Lrotate(y.getRight()));
+					root.demote();
+					root.demote();
+					y.demote();
+					y.getParent().promote();
+					counter+=6;
+					return y.getParent();
+				}
+				if(y.rankDiffLeft()==1 && y.rankDiffRight()==2) {
+					Rrotate(y);
+					root.demote();
+					root.demote();
+					counter+=3;
+					return y;
+				}
+				
+			}
+			
+			// no need for rotations :)
 			return root;
-		}
+		
+	}
+	
+	
 
-		// update the height and size of the node
-		root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight()) + 1);
-		root.setSize(root.getLeft().getSize() + root.getRight().getSize() + 1);
-
-		// let's check if we need to rebalance our subtree
-		int rdl = root.rankDiffLeft();
-		int rdr = root.rankDiffRight();
-
-		if (rdl == 2 && rdr == 2) {
-			root.demote();
-			counter++;
-			return root;
-		}
-		if (rdl == 2 && rdr == 1) {
-			return root;
-		}
-		if (rdl == 1 && rdr == 2) {
-			return root;
-		}
-		if (rdl == 3 && rdr == 1) {
-			IAVLNode y = root.getRight();
-			if (y.rankDiffLeft() == 1 && y.rankDiffRight() == 1) {
-				rotateLeft(y);
-				root.demote();
-				y.promote();
-				counter += 3;
-				return y;
+	private IAVLNode Lrotate(IAVLNode y) {
+			IAVLNode z = y.getParent();
+			IAVLNode b = y.getRight();
+			IAVLNode a = y.getLeft();
+			IAVLNode x = z.getLeft();
+			// start rotation
+			if (z.getParent()!= null) {
+				if (z.getParent().getLeft()==z) {
+					z.getParent().setLeft(y);
+				}else {
+					z.getParent().setRight(y);
+				}
 			}
-			if (y.rankDiffLeft() == 1 && y.rankDiffRight() == 2) {
-				rotateLeft(rotateRight(y.getLeft()));
-				root.demote();
-				root.demote();
-				y.demote();
-				y.getParent().promote();
-				counter += 6;
-				return y.getParent();
-			}
-			if (y.rankDiffLeft() == 2 && y.rankDiffRight() == 1) {
-				rotateLeft(y);
-				root.demote();
-				root.demote();
-				counter += 3;
-				return y;
-			}
-
+			y.setParent(z.getParent());
+			z.setRight(a);
+			a.setParent(z);
+			y.setLeft(z);
+			z.setParent(y);
+			return y;
 		}
-		if (rdl == 1 && rdr == 3) {
-			IAVLNode y = root.getLeft();
-			if (y.rankDiffLeft() == 1 && y.rankDiffRight() == 1) {
-				rotateRight(y);
-				root.demote();
-				y.promote();
-				counter += 3;
-				return y;
+	
+	private IAVLNode Rrotate(IAVLNode y) {
+		IAVLNode z = y.getParent();
+		IAVLNode b = y.getLeft();
+		IAVLNode a = y.getRight();
+		IAVLNode x = z.getRight();
+		// start rotation
+		if (z.getParent()!= null) {
+			if (z.getParent().getLeft()==z) {
+				z.getParent().setLeft(y);
+			}else {
+				z.getParent().setRight(y);
 			}
-			if (y.rankDiffLeft() == 2 && y.rankDiffRight() == 1) {
-				rotateRight(rotateLeft(y.getRight()));
-				root.demote();
-				root.demote();
-				y.demote();
-				y.getParent().promote();
-				counter += 6;
-				return y.getParent();
-			}
-			if (y.rankDiffLeft() == 1 && y.rankDiffRight() == 2) {
-				rotateRight(y);
-				root.demote();
-				root.demote();
-				counter += 3;
-				return y;
-			}
-
 		}
-
-		// no need for rotations :)
-		return root;
-
+		y.setParent(z.getParent());
+		z.setLeft(a);
+		a.setParent(z);
+		y.setRight(z);
+		z.setParent(y);
+		return y;
 	}
 
 	private void Switch(IAVLNode n, IAVLNode s) {
