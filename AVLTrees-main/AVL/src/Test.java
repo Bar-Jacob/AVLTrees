@@ -43,12 +43,13 @@ public class Test{
 		for(int i = 20; i > 4; i--) {
 			tree.insert(i, ""+i);
 		}
-//		print2D(tree.getRoot());
 		
-//		for(int i = 20; i > 4; i--) {
-//			tree.delete(i);
-//		}
-//		
+		for(int i = 20; i > 5; i--) {
+			tree.delete(i);
+		}
+		
+		print2D(tree.getRoot());
+		
 		
 
 		
@@ -60,10 +61,10 @@ public class Test{
 //		AVLTree tree3 = new AVLTree();
 //		tree3.insert(2, ""+2);
 		
-		AVLTree[] splitted = tree.split(18);
-		print2D(splitted[0].getRoot());
-		System.out.println("************************");
-		print2D(splitted[1].getRoot());
+//		AVLTree[] splitted = tree.split(18);
+//		print2D(splitted[0].getRoot());
+//		System.out.println("************************");
+//		print2D(splitted[1].getRoot());
 //		System.out.println(isNodeBalanced(splitted[1].getRoot()));
 //		System.out.println(isNodeBalanced(splitted[0].getRoot()));
 		

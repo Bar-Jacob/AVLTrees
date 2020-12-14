@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
 
+
 /**
  *
  * AVLTree
@@ -692,126 +693,112 @@ public class AVLTree {
 	 * (|tree.rank - t.rank| + 1). precondition: keys(x,t) < keys() or keys(x,t) >
 	 * keys(). t/tree might be empty (rank = -1). postcondition: none
 	 */
-		public int join(IAVLNode x, AVLTree t) {
-		int valtoreturn = Math.abs(this.getHeight()-t.getHeight()) +1;
-		
-		if (t.empty() && this.empty()) {
-			this.max = x;
-			this.min = x;
-			this.root = x;
-			x.update();
-			return valtoreturn;
-		}
-		else if (t.empty()) {
-			// t is empty. we can just insert x to this
-			this.insert(x.getKey(), x.getValue());
-			return valtoreturn;
-		
-		}else if (this.empty()) {
-			// tree is empty. we can just insert x to t and set tree.root <--- t.root
-			t.insert(x.getKey(), x.getValue());
-			this.root = t.root;
-			this.max = t.max;
-			this.min = t.min;
-			return valtoreturn;
-		}
-		// t && tree are not empty
-		
-		// lets check which tree should be on which side
-		AVLTree Rtree;
-		AVLTree Ltree;
-		if (this.getRoot().getKey()>x.getKey()) {
-			Rtree = this;
-			Ltree = t;
-		}else {
-			Ltree = this;
-			Rtree = t;
-		}
-		// now lets check which tree is higher
-		int heightdiff = Rtree.getRoot().getHeight() - Ltree.getRoot().getHeight();
-		if (heightdiff == 0) {
-			//trees are equal in height
-			x.setRight(Rtree.getRoot());
-			x.setLeft(Ltree.getRoot());
-			this.root=x;
-			x.update();
-			this.max = Rtree.max;
-			this.min = Ltree.min;
-			return 1;
-			
-		}else if (heightdiff > 0) {
-			//Rtree is taller than Ltree
-			IAVLNode temp = null;
-			temp = Rtree.root;
-			while (temp.getHeight()>Ltree.getRoot().getHeight()) {
-				temp = temp.getLeft();
-			}
-			
-			/* set x to be:
-			 *  	         temp.parent
-			 *	     		/
-			 *      	   x
-			 *     		 /   \
-			 * Ltree.root     temp
-			 */
-			x.setParent(temp.getParent());
-			x.setLeft(Ltree.getRoot());
-			x.getLeft().setParent(x);
-			x.setRight(temp);
-			x.getRight().setParent(x);
-			x.getParent().setLeft(x);
-			this.root = Rtree.getRoot();
-			x.calcRank();
-			this.rebalance(x);
-			x.updatePath();
-			
-			
-		}else if(heightdiff < 0){
-			//Ltree is taller than Rtree
-			IAVLNode temp = null;
-			temp = Ltree.root;
-
-			while (temp.getHeight()>Rtree.getRoot().getHeight()) {
-				temp = temp.getRight();
-			}
-			/* set x to be:
-			 * temp.parent
-			 *	     \
-			 *        x
-			 *      /   \
-			 *  temp      Rtree.root
-			 */
-			x.setParent(temp.getParent());
-			x.setRight(Rtree.getRoot());
-			x.setLeft(temp);
-			x.getRight().setParent(x);
-			x.getLeft().setParent(x);
-			x.getParent().setRight(x);
-			this.root = Ltree.getRoot();
-			x.calcRank();
-			this.rebalance(x);
-			x.updatePath();
-			
-		}
-		this.max = Rtree.max;
-		this.min = Ltree.min;
+	public int join(IAVLNode x, AVLTree t) {
+	int valtoreturn = Math.abs(this.getHeight()-t.getHeight()) +1;
+	
+	if (t.empty() && this.empty()) {
+		this.max = x;
+		this.min = x;
+		this.root = x;
+		x.update();
 		return valtoreturn;
 	}
+	else if (t.empty()) {
+		// t is empty. we can just insert x to this
+		this.insert(x.getKey(), x.getValue());
+		return valtoreturn;
+	
+	}else if (this.empty()) {
+		// tree is empty. we can just insert x to t and set tree.root <--- t.root
+		t.insert(x.getKey(), x.getValue());
+		this.root = t.root;
+		this.max = t.max;
+		this.min = t.min;
+		return valtoreturn;
+	}
+	// t && tree are not empty
+	
+	// lets check which tree should be on which side
+	AVLTree Rtree;
+	AVLTree Ltree;
+	if (this.getRoot().getKey()>x.getKey()) {
+		Rtree = this;
+		Ltree = t;
+	}else {
+		Ltree = this;
+		Rtree = t;
+	}
+	// now lets check which tree is higher
+	int heightdiff = Rtree.getRoot().getHeight() - Ltree.getRoot().getHeight();
+	if (heightdiff == 0) {
+		//trees are equal in height
+		x.setRight(Rtree.getRoot());
+		x.setLeft(Ltree.getRoot());
+		this.root=x;
+		x.update();
+		this.max = Rtree.max;
+		this.min = Ltree.min;
+		return 1;
 		
-//	public void rebalanceForJoin(IAVLNode node) {
-//		if(node.getParent().rankDiffRight() == 0 &&
-//				node.getParent().rankDiffLeft() == 1 &&
-//				node.getParent().getParent() == null) {
-//			node.promote();
-//			rotateLeft(node.getParent());
-//		}
-//		if(node.getParent().rankDiffLeft() == 0 &&
-//				node.getParent().rankDiffRight() == 1 &&
-//				node.getParent().getParent() == null) {
-//			node.promote();
-//			rotateRight(node.getParent());
-//		}
-//	}
+	}else if (heightdiff > 0) {
+		//Rtree is taller than Ltree
+		IAVLNode temp = null;
+		temp = Rtree.root;
+		while (temp.getHeight()>Ltree.getRoot().getHeight()) {
+			temp = temp.getLeft();
+		}
+		
+		/* set x to be:
+		 *  	         temp.parent
+		 *	     		/
+		 *      	   x
+		 *     		 /   \
+		 * Ltree.root     temp
+		 */
+		x.setParent(temp.getParent());
+		x.setLeft(Ltree.getRoot());
+		x.getLeft().setParent(x);
+		x.setRight(temp);
+		x.getRight().setParent(x);
+		x.getParent().setLeft(x);
+		this.root = Rtree.getRoot();
+		x.calcRank();
+		this.rebalance(x);
+		x.updatePath();
+		
+		
+	}else if(heightdiff < 0){
+		//Ltree is taller than Rtree
+		IAVLNode temp = null;
+		temp = Ltree.root;
+
+		while (temp.getHeight()>Rtree.getRoot().getHeight()) {
+			temp = temp.getRight();
+		}
+		/* set x to be:
+		 * temp.parent
+		 *	     \
+		 *        x
+		 *      /   \
+		 *  temp      Rtree.root
+		 */
+		x.setParent(temp.getParent());
+		x.setRight(Rtree.getRoot());
+		x.setLeft(temp);
+		x.getRight().setParent(x);
+		x.getLeft().setParent(x);
+		x.getParent().setRight(x);
+		this.root = Ltree.getRoot();
+		x.calcRank();
+		this.rebalance(x);
+		x.updatePath();
+		
+	}
+	this.max = Rtree.max;
+	this.min = Ltree.min;
+	return valtoreturn;
+}
+		
 
 	public IAVLNode rotateRight(IAVLNode node) {
 
