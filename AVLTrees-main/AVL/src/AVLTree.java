@@ -696,7 +696,7 @@ public class AVLTree {
 		}
 		// now lets check which tree is higher
 		int heightdiff = Rtree.getRoot().getHeight() - Ltree.getRoot().getHeight();
-		if (heightdiff==0) {
+		if (heightdiff == 0) {
 			//trees are equal in height
 			x.setRight(Rtree.getRoot());
 			x.setLeft(Ltree.getRoot());
@@ -706,7 +706,7 @@ public class AVLTree {
 			this.min = Ltree.min;
 			return 1;
 			
-		}else if (heightdiff> 0) {
+		}else if (heightdiff > 0) {
 			//Rtree is taller than Ltree
 			IAVLNode temp = null;
 			temp = Rtree.root;
@@ -733,7 +733,7 @@ public class AVLTree {
 			x.updatePath();
 			
 			
-		}else {
+		}else if(heightdiff < 0){
 			//Ltree is taller than Rtree
 			IAVLNode temp = null;
 			temp = Ltree.root;
@@ -764,6 +764,21 @@ public class AVLTree {
 		this.min = Ltree.min;
 		return valtoreturn;
 	}
+		
+//	public void rebalanceForJoin(IAVLNode node) {
+//		if(node.getParent().rankDiffRight() == 0 &&
+//				node.getParent().rankDiffLeft() == 1 &&
+//				node.getParent().getParent() == null) {
+//			node.promote();
+//			rotateLeft(node.getParent());
+//		}
+//		if(node.getParent().rankDiffLeft() == 0 &&
+//				node.getParent().rankDiffRight() == 1 &&
+//				node.getParent().getParent() == null) {
+//			node.promote();
+//			rotateRight(node.getParent());
+//		}
+//	}
 
 	public IAVLNode rotateRight(IAVLNode node) {
 

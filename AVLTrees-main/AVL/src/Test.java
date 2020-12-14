@@ -43,6 +43,7 @@ public class Test{
 		for(int i = 20; i > 4; i--) {
 			tree.insert(i, ""+i);
 		}
+//		print2D(tree.getRoot());
 		
 //		for(int i = 20; i > 4; i--) {
 //			tree.delete(i);
@@ -59,10 +60,12 @@ public class Test{
 //		AVLTree tree3 = new AVLTree();
 //		tree3.insert(2, ""+2);
 		
-		AVLTree[] splitted = tree.split(20);
+		AVLTree[] splitted = tree.split(18);
 		print2D(splitted[0].getRoot());
 		System.out.println("************************");
 		print2D(splitted[1].getRoot());
+//		System.out.println(isNodeBalanced(splitted[1].getRoot()));
+//		System.out.println(isNodeBalanced(splitted[0].getRoot()));
 		
 //		print2D(tree.getRoot());
 
@@ -119,18 +122,18 @@ public class Test{
 //		return isNodeBalanced && isTreeBalanced(root.getRight()) && isTreeBalanced(root.getLeft());
 //	}
 //
-//	public static boolean isNodeBalanced(IAVLNode node) {
-//		if (node.isRealNode()) {
-//			return ((node.getHeight() - node.getRight().getHeight() == 1)
-//					&& (node.getHeight() - node.getLeft().getHeight() == 1))
-//					|| ((node.getHeight() - node.getRight().getHeight() == 1)
-//							&& (node.getHeight() - node.getLeft().getHeight() == 2))
-//					|| ((node.getHeight() - node.getRight().getHeight() == 2)
-//							&& (node.getHeight() - node.getLeft().getHeight() == 1));
-//
-//		} else {
-//			return ((node.getRight() == null) && (node.getLeft() == null));
-//		}
-//	}
+	public static boolean isNodeBalanced(AVLTree.IAVLNode node) {
+		if (node.isRealNode()) {
+			return ((node.getHeight() - node.getRight().getHeight() == 1)
+					&& (node.getHeight() - node.getLeft().getHeight() == 1))
+					|| ((node.getHeight() - node.getRight().getHeight() == 1)
+							&& (node.getHeight() - node.getLeft().getHeight() == 2))
+					|| ((node.getHeight() - node.getRight().getHeight() == 2)
+							&& (node.getHeight() - node.getLeft().getHeight() == 1));
+
+		} else {
+			return ((node.getRight() == null) && (node.getLeft() == null));
+		}
+	}
 
 }
