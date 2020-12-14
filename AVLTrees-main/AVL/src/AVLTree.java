@@ -169,7 +169,7 @@ public class AVLTree {
 	 * - counted as one rebalnce operation, double-rotation is counted as 2. returns
 	 * -1 if an item with key k was not found in the tree.
 	 */
-	public int delete(int k) {
+		public int delete(int k) {
 		// first, we need to check if we're deleting a saved field(min/max)
 		int [] binaryminmax= {0,0};
 		if (this.min.getKey()==k) {
@@ -177,7 +177,7 @@ public class AVLTree {
 		if (this.max.getKey()==k) {
 			binaryminmax[1]=1;}
 		// initializing a counter for rebalancing actions
-		int counter =0;
+		int[] counter = {0};
 		if (this.search(k)==null) {
 			// there is no key with value k in the tree
 			return -1;}
@@ -192,11 +192,11 @@ public class AVLTree {
 			updatemin();}
 		if (binaryminmax[1]==1) {
 			updatemax();}
-		return counter;
+		return counter[0];
 		}
 	
 	// a recursive deletion function, returns the node on the right/left with it's subtree balanced and without node k
-	private IAVLNode DelRec(int k,IAVLNode root, int counter) {
+	private IAVLNode DelRec(int k,IAVLNode root, int[] counter) {
 		// First we find the node recursively
 		if (!root.isRealNode()) {
 			return root;} 			// recursion end
@@ -248,7 +248,7 @@ public class AVLTree {
 			
 			if (rdl==2 && rdr==2) {
 				root.demote();
-				counter++;
+				counter[0]+=1;
 				return root;
 			}
 			if (rdl==2 && rdr==1) {
@@ -263,7 +263,7 @@ public class AVLTree {
 					Lrotate(y);
 					root.demote();
 					y.promote();
-					counter+=3;
+					counter[0]+=3;
 					return y;
 				}
 				if(y.rankDiffLeft()==1 && y.rankDiffRight()==2) {
@@ -272,14 +272,14 @@ public class AVLTree {
 					root.demote();
 					y.demote();
 					y.getParent().promote();
-					counter+=6;
+					counter[0]+=6;
 					return y.getParent();
 				}
 				if(y.rankDiffLeft()==2 && y.rankDiffRight()==1) {
 					Lrotate(y);
 					root.demote();
 					root.demote();
-					counter+=3;
+					counter[0]+=3;
 					return y;
 				}
 				
@@ -290,7 +290,7 @@ public class AVLTree {
 					Rrotate(y);
 					root.demote();
 					y.promote();
-					counter+=3;
+					counter[0]+=3;
 					return y;
 				}
 				if(y.rankDiffLeft()==2 && y.rankDiffRight()==1) {
@@ -299,14 +299,14 @@ public class AVLTree {
 					root.demote();
 					y.demote();
 					y.getParent().promote();
-					counter+=6;
+					counter[0]+=6;
 					return y.getParent();
 				}
 				if(y.rankDiffLeft()==1 && y.rankDiffRight()==2) {
 					Rrotate(y);
 					root.demote();
 					root.demote();
-					counter+=3;
+					counter[0]+=3;
 					return y;
 				}
 				
@@ -316,7 +316,6 @@ public class AVLTree {
 			return root;
 		
 	}
-	
 	
 
 	private IAVLNode Lrotate(IAVLNode y) {
