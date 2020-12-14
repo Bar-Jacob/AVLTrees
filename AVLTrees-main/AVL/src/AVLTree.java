@@ -159,31 +159,34 @@ public class AVLTree {
 	 * - counted as one rebalnce operation, double-rotation is counted as 2. returns
 	 * -1 if an item with key k was not found in the tree.
 	 */
-	public int delete(int k) {
-		int binarymax=0;
-		int binarymin=0;
-		if (this.max.getKey()==k) {
-			binarymax =1;
-		}
+		public int delete(int k) {
+		// first, we need to check if we're deleting a saved field(min/max)
+		int [] binaryminmax= {0,0};
 		if (this.min.getKey()==k) {
-			binarymin =1;
-		}
+			binaryminmax[0]=1;}
+		if (this.max.getKey()==k) {
+			binaryminmax[1]=1;}
+		// initializing a counter for rebalancing actions
 		int counter =0;
 		if (this.search(k)==null) {
+			// there is no key with value k in the tree
 			return -1;}
+		//starting recursive function
 		this.root=DelRec(k, this.root, counter);
 		if (this.root==virtualLeaf) {
+			//the tree is empty
 			this.root = null;
 		}
-		if (binarymax==1) {
-			updatemax();}
-		if (binarymin==1) {
+		// update lost values 
+		if (binaryminmax[0]==1) {
 			updatemin();}
+		if (binaryminmax[1]==1) {
+			updatemax();}
 		return counter;
 		}
 	
 	// a recursive deletion function, returns the node on the right/left with it's subtree balanced and without node k
-		private IAVLNode DelRec(int k,IAVLNode root, int counter) {
+	private IAVLNode DelRec(int k,IAVLNode root, int counter) {
 		// First we find the node recursively
 		if (!root.isRealNode()) {
 			return root;} 			// recursion end
@@ -207,9 +210,7 @@ public class AVLTree {
 				if (!temp.isRealNode()) {
 					// root doesn't have kids
 					root= virtualLeaf;
-					root.getParent().demote();
 				}else {
-					root.getParent().demote();
 					root= temp;
 				}
 			}else {
@@ -221,7 +222,6 @@ public class AVLTree {
 				// now the root and it's successor are switched. lets delete the the root node from the right subtree recursively
 				successor.setRight(DelRec(k, successor.getRight(), counter));
 				root = successor;
-				root.calcRank();
 			}
 		}
 			
@@ -229,38 +229,14 @@ public class AVLTree {
 				return root;
 			}
 			
-			// update the height, size and rank of the node
+			// update the height and size of the node
 			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
 			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
-//			root.calcRank();
-			
-			// calc balance factor
-			int bala = Bfactor(root);
-			
+
 			// let's check if we need to rebalance our subtree
 			int rdl = root.rankDiffLeft();
 			int rdr = root.rankDiffRight();
-			/**
-			if (rdl==0) {
-				if(rdr==0) {
-					root.promote();
-					counter++;
-					return root;
-				}
-				if(rdr==1) {
-					return root;
-				}
-				if(rdr==2) {
-					
-				}
-			}
 			
-			if (rdr==0) {
-				if(rdr==1) {
-					return root;
-				}
-			}
-			*/
 			if (rdl==2 && rdr==2) {
 				root.demote();
 				counter++;
@@ -326,33 +302,7 @@ public class AVLTree {
 				}
 				
 			}
-			/**
-//			System.out.println("we need to balance node "+root.getKey());
-			if (bala>1) {
-				if (Bfactor(root.getLeft())<0) {
-					// Left Right rotation
-					counter+= 2;
-					root.setLeft(rotateLeft(root.getLeft()));
-					return(rotateRight(root.getRight()));
-				}else {
-					// Left Left rotation
-					counter++;
-					return(rotateRight(root));
-				}
-			}
-			if (bala<-1) {
-				if (Bfactor(root.getRight())<=0) {
-					// Right Right rotation
-					counter++;
-					return rotateLeft(root);
-				}else {
-					// Right Left rotation
-					counter+= 2;
-					root.setRight(rotateRight(root.getRight()));
-					return rotateLeft(root);
-				}
-			}
-			*/
+			
 			// no need for rotations :)
 			return root;
 		
