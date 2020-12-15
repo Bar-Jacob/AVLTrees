@@ -181,6 +181,9 @@ public class AVLTree {
 	 * -1 if an item with key k was not found in the tree.
 	 */
 	public int delete(int k) {
+		if (this.search(k)==null) {
+			// there is no key with value k in the tree
+			return -1;}
 		// first, we need to check if we're deleting a saved field(min/max)
 		int [] binaryminmax= {0,0};
 		if (this.min.getKey()==k) {
@@ -189,9 +192,6 @@ public class AVLTree {
 			binaryminmax[1]=1;}
 		// initializing a counter for rebalancing actions
 		int[] counter = {0};
-		if (this.search(k)==null) {
-			// there is no key with value k in the tree
-			return -1;}
 		//starting recursive function
 		this.root=DelRec(k, this.root, counter);
 		if (this.root==virtualLeaf) {
