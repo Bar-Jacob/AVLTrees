@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+
 
 
 /**
@@ -20,6 +20,9 @@ public class AVLTree {
 	private IAVLNode max;
 	private IAVLNode virtualLeaf = new AVLNode();
 
+	public int MAXKEY() {
+		return this.max.getKey();
+	}
 	/**
 	 * public boolean empty()
 	 *
@@ -27,7 +30,14 @@ public class AVLTree {
 	 *
 	 */
 	public boolean empty() {
-		return (this.root == null);
+		if (this.root == null){
+			return true;
+		}
+		if (!this.root.isRealNode()) {
+			this.root=null;
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -56,7 +66,7 @@ public class AVLTree {
 	public int insert(int k, String i) {
 
 		IAVLNode newNode = new AVLNode(k, i);
-		if (this.empty()) { // insert root
+		if (this.empty()||!this.root.isRealNode()) { // insert root
 			this.root = (AVLNode) newNode;
 			this.max = (AVLNode) newNode;
 			this.min = (AVLNode) newNode;
@@ -436,6 +446,9 @@ public class AVLTree {
 	 * @return node with key == k or null if there is no such node in the tree
 	 */
 	private IAVLNode SearchNode(int k) {
+		if (this.empty()){
+			return null;
+		}
 		IAVLNode node = this.getRoot();
 		while (node.isRealNode()) {
 			if (node.getKey() == k) {
@@ -658,15 +671,19 @@ public class AVLTree {
 			//adding to the smaller tree
 			if(pNode.getKey() < x) {
 				AVLTree smaller = new AVLTree();
-				smaller.root = pNode.getLeft();
-				smaller.root.setParent(null);
+				if(!pNode.getLeft().isRealNode()) {
+					smaller.root = pNode.getLeft();
+					smaller.root.setParent(null);
+				}
 				result[0].join(duplicatePNode, smaller);
 				
 			}else {
 				//adding to the bigger tree
 				AVLTree bigger = new AVLTree();
-				bigger.root = pNode.getRight();
-				bigger.root.setParent(null);
+				if(!pNode.getRight().isRealNode()) {
+					bigger.root = pNode.getRight();
+					bigger.root.setParent(null);
+				}
 				result[1].join(duplicatePNode, bigger);
 				result[1] = bigger;
 			}
@@ -699,18 +716,17 @@ public class AVLTree {
 	if (t.empty() && this.empty()) {
 		this.max = x;
 		this.min = x;
-		this.root = x;
-		x.update();
+		this.insert(x.getKey(), x.getValue());
 		return valtoreturn;
 	}
-	else if (t.empty()) {
+	else if (t.empty()||!t.root.isRealNode()) {
 		// t is empty. we can just insert x to this
 		this.insert(x.getKey(), x.getValue());
 		return valtoreturn;
 	
 	}else if (this.empty()) {
 		// tree is empty. we can just insert x to t and set tree.root <--- t.root
-		t.insert(x.getKey(), x.getValue());
+
 		this.root = t.root;
 		this.max = t.max;
 		this.min = t.min;
@@ -730,7 +746,7 @@ public class AVLTree {
 	}
 	// now lets check which tree is higher
 	int heightdiff = Rtree.getRoot().getHeight() - Ltree.getRoot().getHeight();
-	if (heightdiff == 0) {
+	if (heightdiff == 0||heightdiff == 1||heightdiff == -1) {
 		//trees are equal in height
 		x.setRight(Rtree.getRoot());
 		x.setLeft(Ltree.getRoot());
@@ -743,9 +759,11 @@ public class AVLTree {
 	}else if (heightdiff > 0) {
 		//Rtree is taller than Ltree
 		IAVLNode temp = null;
-		temp = Rtree.root;
+		temp = Rtree.root; 
 		while (temp.getHeight()>Ltree.getRoot().getHeight()) {
-			temp = temp.getLeft();
+//			if (temp.getLeft().isRealNode()) {
+				temp = temp.getLeft();
+//			}			
 		}
 		
 		/* set x to be:
@@ -755,6 +773,7 @@ public class AVLTree {
 		 *     		 /   \
 		 * Ltree.root     temp
 		 */
+
 		x.setParent(temp.getParent());
 		x.setLeft(Ltree.getRoot());
 		x.getLeft().setParent(x);
@@ -773,7 +792,9 @@ public class AVLTree {
 		temp = Ltree.root;
 
 		while (temp.getHeight()>Rtree.getRoot().getHeight()) {
-			temp = temp.getRight();
+//			if (temp.getRight().isRealNode()) {
+				temp = temp.getRight();
+//			}
 		}
 		/* set x to be:
 		 * temp.parent
@@ -799,6 +820,68 @@ public class AVLTree {
 	return valtoreturn;
 }
 		
+
+	private IAVLNode fixpath(IAVLNode root) {
+		// first update the height anvd size of the node
+			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
+			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
+
+		// let's check if we need to rebalance our subtree
+			int rdl = root.rankDiffLeft();
+			int rdr = root.rankDiffRight();
+			
+			if (rdl==0 && rdr==0) {
+				root.promote();
+			}
+			if (rdl==1 && rdr==0) {
+				root.promote();
+			}
+			if (rdl==0 && rdr==1) {
+				root.promote();
+			}
+			if (rdl==0 && rdr==2) {
+				if (root.rankDiffLeft()==1 && root.rankDiffRight()==2) {
+					Rrotate(root.getLeft());
+				}else {
+					if (root.rankDiffLeft()==2 && root.rankDiffRight()==1) {
+						IAVLNode b =Rrotate(Lrotate(root.getLeft().getRight()));
+						b.getLeft().demote();
+						b.getRight().demote();
+						b.promote();
+						root=b;
+					}else { 	
+						root.getLeft().promote();		// case of 02 with 11 son
+						root = Rrotate(root); 
+					}
+					
+				}
+				
+			}
+			if (rdl==2 && rdr==0) {
+				if (root.rankDiffLeft()==2 && root.rankDiffRight()==1) {
+					Lrotate(root.getRight());
+				}else {
+					if (root.rankDiffLeft()==1 && root.rankDiffRight()==2) {
+						IAVLNode b =Lrotate(Rrotate(root.getRight().getLeft()));
+						b.getLeft().demote();
+						b.getRight().demote();
+						b.promote();
+						root=b;
+					}else { 	
+						root.getRight().promote();		// case of 20 with 11 son
+						root = Lrotate(root); 
+					}
+					
+				}
+				
+			}
+			// now our root is balanced and updated
+			if (root.getParent()==null){
+				// top of the tree
+				return root;
+			}
+			return fixpath(root.getParent());
+	}
 
 	public IAVLNode rotateRight(IAVLNode node) {
 
