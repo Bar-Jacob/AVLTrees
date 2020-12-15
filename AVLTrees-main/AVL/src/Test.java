@@ -40,9 +40,9 @@ public class Test{
 	public static void main(String[] args) {
 		
 		AVLTree tree = new AVLTree();
-//		for(int i = 20; i > 0; i--) {
-//			tree.insert(i, ""+i);
-//		}
+		for(int i = 20; i > 0; i--) {
+			tree.insert(i, ""+i);
+		}
 //		
 //		for(int i = 20; i > 5; i--) {
 //			tree.delete(i);
@@ -50,9 +50,9 @@ public class Test{
 		
 //		print2D(tree.getRoot());
 		
-		int[] keysToArray = tree.keysToArray();
-		String[] infoToArray = tree.infoToArray();
-		System.out.println(Arrays.toString(keysToArray));
+//		int[] keysToArray = tree.keysToArray();
+//		String[] infoToArray = tree.infoToArray();
+//		System.out.println(Arrays.toString(keysToArray));
 
 		
 //		AVLTree tree2 = new AVLTree();
@@ -63,10 +63,10 @@ public class Test{
 //		AVLTree tree3 = new AVLTree();
 //		tree3.insert(2, ""+2);
 		
-//		AVLTree[] splitted = tree.split(18);
-//		print2D(splitted[0].getRoot());
-//		System.out.println("************************");
-//		print2D(splitted[1].getRoot());
+		AVLTree[] splitted = tree.split(1);
+		print2D(splitted[0].getRoot());
+		System.out.println("************************");
+		print2D(splitted[1].getRoot());
 //		System.out.println(isNodeBalanced(splitted[1].getRoot()));
 //		System.out.println(isNodeBalanced(splitted[0].getRoot()));
 		

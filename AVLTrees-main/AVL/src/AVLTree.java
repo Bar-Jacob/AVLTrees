@@ -671,7 +671,7 @@ public class AVLTree {
 			//adding to the smaller tree
 			if(pNode.getKey() < x) {
 				AVLTree smaller = new AVLTree();
-				if(!pNode.getLeft().isRealNode()) {
+				if(pNode.getLeft().isRealNode()) {
 					smaller.root = pNode.getLeft();
 					smaller.root.setParent(null);
 				}
@@ -680,12 +680,11 @@ public class AVLTree {
 			}else {
 				//adding to the bigger tree
 				AVLTree bigger = new AVLTree();
-				if(!pNode.getRight().isRealNode()) {
+				if(pNode.getRight().isRealNode()) {
 					bigger.root = pNode.getRight();
 					bigger.root.setParent(null);
 				}
 				result[1].join(duplicatePNode, bigger);
-				result[1] = bigger;
 			}
 			
 			pNode = pNode.getParent();
@@ -726,10 +725,10 @@ public class AVLTree {
 	
 	}else if (this.empty()) {
 		// tree is empty. we can just insert x to t and set tree.root <--- t.root
-
 		this.root = t.root;
 		this.max = t.max;
 		this.min = t.min;
+		this.insert(x.getKey(), x.getValue());
 		return valtoreturn;
 	}
 	// t && tree are not empty
@@ -821,67 +820,6 @@ public class AVLTree {
 }
 		
 
-	private IAVLNode fixpath(IAVLNode root) {
-		// first update the height anvd size of the node
-			root.setHeight(Math.max(root.getLeft().getHeight(), root.getRight().getHeight())+1);
-			root.setSize(root.getLeft().getSize()+ root.getRight().getSize()+1);
-
-		// let's check if we need to rebalance our subtree
-			int rdl = root.rankDiffLeft();
-			int rdr = root.rankDiffRight();
-			
-			if (rdl==0 && rdr==0) {
-				root.promote();
-			}
-			if (rdl==1 && rdr==0) {
-				root.promote();
-			}
-			if (rdl==0 && rdr==1) {
-				root.promote();
-			}
-			if (rdl==0 && rdr==2) {
-				if (root.rankDiffLeft()==1 && root.rankDiffRight()==2) {
-					Rrotate(root.getLeft());
-				}else {
-					if (root.rankDiffLeft()==2 && root.rankDiffRight()==1) {
-						IAVLNode b =Rrotate(Lrotate(root.getLeft().getRight()));
-						b.getLeft().demote();
-						b.getRight().demote();
-						b.promote();
-						root=b;
-					}else { 	
-						root.getLeft().promote();		// case of 02 with 11 son
-						root = Rrotate(root); 
-					}
-					
-				}
-				
-			}
-			if (rdl==2 && rdr==0) {
-				if (root.rankDiffLeft()==2 && root.rankDiffRight()==1) {
-					Lrotate(root.getRight());
-				}else {
-					if (root.rankDiffLeft()==1 && root.rankDiffRight()==2) {
-						IAVLNode b =Lrotate(Rrotate(root.getRight().getLeft()));
-						b.getLeft().demote();
-						b.getRight().demote();
-						b.promote();
-						root=b;
-					}else { 	
-						root.getRight().promote();		// case of 20 with 11 son
-						root = Lrotate(root); 
-					}
-					
-				}
-				
-			}
-			// now our root is balanced and updated
-			if (root.getParent()==null){
-				// top of the tree
-				return root;
-			}
-			return fixpath(root.getParent());
-	}
 
 	public IAVLNode rotateRight(IAVLNode node) {
 
