@@ -611,6 +611,9 @@ public class AVLTree {
 	 * precondition: none postcondition: none
 	 */
 	public int size() {
+		if (this.empty()) {
+			return 0;
+		}
 		return this.root.getSize();
 	}
 
