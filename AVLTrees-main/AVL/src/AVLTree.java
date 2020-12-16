@@ -327,10 +327,8 @@ public class AVLTree {
 			return root;
 		
 	}
-	
-	
 
-	private IAVLNode Lrotate(IAVLNode y) {
+		private IAVLNode Lrotate(IAVLNode y) {
 			IAVLNode z = y.getParent();
 			IAVLNode b = y.getRight();
 			IAVLNode a = y.getLeft();
@@ -348,6 +346,11 @@ public class AVLTree {
 			a.setParent(z);
 			y.setLeft(z);
 			z.setParent(y);
+			IAVLNode[] list = {a,b,z,x,y};
+			for (IAVLNode node : list) {
+				if (node.isRealNode()) {
+					node.update();}
+			}
 			return y;
 		}
 	
@@ -369,6 +372,11 @@ public class AVLTree {
 		a.setParent(z);
 		y.setRight(z);
 		z.setParent(y);
+		IAVLNode[] list = {a,b,z,x,y};
+		for (IAVLNode node : list) {
+			if (node.isRealNode()) {
+				node.update();}
+		}
 		return y;
 	}
 
