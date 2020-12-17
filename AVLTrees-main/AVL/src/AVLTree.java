@@ -756,7 +756,7 @@ public class AVLTree {
 	}
 	// now lets check which tree is higher
 	int heightdiff = Rtree.getRoot().getHeight() - Ltree.getRoot().getHeight();
-	if (heightdiff == 0||heightdiff == 1||heightdiff == -1) {
+	if (heightdiff <= 1 && heightdiff >= -1) {
 		//trees are equal in height
 		x.setRight(Rtree.getRoot());
 		x.setLeft(Ltree.getRoot());
