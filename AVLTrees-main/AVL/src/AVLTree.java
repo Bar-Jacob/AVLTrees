@@ -789,7 +789,8 @@ public class AVLTree {
 		x.getLeft().setParent(x);
 		x.setRight(temp);
 		x.getRight().setParent(x);
-		x.getParent().setLeft(x);
+		if (x.getParent().isRealNode()) {
+			x.getParent().setLeft(x);}
 		this.root = Rtree.getRoot();
 		x.calcRank();
 		this.rebalance(x);
@@ -818,7 +819,8 @@ public class AVLTree {
 		x.setLeft(temp);
 		x.getRight().setParent(x);
 		x.getLeft().setParent(x);
-		x.getParent().setRight(x);
+		if (x.getParent().isRealNode()) {
+			x.getParent().setRight(x);}
 		this.root = Ltree.getRoot();
 		x.calcRank();
 		this.rebalance(x);
@@ -1012,6 +1014,8 @@ public class AVLTree {
 
 		// Returns True if this is a non-virtual AVL node
 		public boolean isRealNode() {
+			if (this==null){
+				return false;}
 			return ((this.getKey() != -1) ? true : false); // returns true if the key is positive else returns false
 		}
 
