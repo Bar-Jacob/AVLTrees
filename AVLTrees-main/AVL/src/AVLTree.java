@@ -789,7 +789,8 @@ public class AVLTree {
 		x.getLeft().setParent(x);
 		x.setRight(temp);
 		x.getRight().setParent(x);
-		x.getParent().setLeft(x);
+		if (x.getParent()!=null) {
+			x.getParent().setLeft(x);}
 		this.root = Rtree.getRoot();
 		x.calcRank();
 		this.rebalance(x);
@@ -818,7 +819,8 @@ public class AVLTree {
 		x.setLeft(temp);
 		x.getRight().setParent(x);
 		x.getLeft().setParent(x);
-		x.getParent().setRight(x);
+		if (x.getParent()!=null) {
+			x.getParent().setRight(x);}
 		this.root = Ltree.getRoot();
 		x.calcRank();
 		this.rebalance(x);
