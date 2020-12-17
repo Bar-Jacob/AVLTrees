@@ -231,6 +231,7 @@ public class AVLTree {
 					// root doesn't have kids
 					root= virtualLeaf;
 				}else {
+					temp.setParent(root.getParent());
 					root= temp;
 				}
 			}else {
