@@ -231,6 +231,7 @@ public class AVLTree {
 					// root doesn't have kids
 					root= virtualLeaf;
 				}else {
+					temp.setParent(root.getParent());
 					root= temp;
 				}
 			}else {
@@ -756,7 +757,7 @@ public class AVLTree {
 	}
 	// now lets check which tree is higher
 	int heightdiff = Rtree.getRoot().getHeight() - Ltree.getRoot().getHeight();
-	if (heightdiff == 0||heightdiff == 1||heightdiff == -1) {
+	if (heightdiff <= 1 && heightdiff >= -1) {
 		//trees are equal in height
 		x.setRight(Rtree.getRoot());
 		x.setLeft(Ltree.getRoot());
@@ -789,7 +790,8 @@ public class AVLTree {
 		x.getLeft().setParent(x);
 		x.setRight(temp);
 		x.getRight().setParent(x);
-		x.getParent().setLeft(x);
+		if (x.getParent()!=null) {
+			x.getParent().setLeft(x);}
 		this.root = Rtree.getRoot();
 		x.calcRank();
 		this.rebalance(x);
@@ -818,7 +820,8 @@ public class AVLTree {
 		x.setLeft(temp);
 		x.getRight().setParent(x);
 		x.getLeft().setParent(x);
-		x.getParent().setRight(x);
+		if (x.getParent()!=null) {
+			x.getParent().setRight(x);}
 		this.root = Ltree.getRoot();
 		x.calcRank();
 		this.rebalance(x);
